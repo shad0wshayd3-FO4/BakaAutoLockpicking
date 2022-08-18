@@ -7,6 +7,9 @@
 #include "F4SE/F4SE.h"
 
 #include <AutoTOML.hpp>
+#include <effolkronium/random.hpp>
+#include <fmt/printf.h>
+#include <SimpleIni.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 
