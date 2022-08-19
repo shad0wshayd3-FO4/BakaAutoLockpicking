@@ -26,5 +26,7 @@ namespace stl
 	void asm_replace(std::uintptr_t a_from, std::size_t a_size, std::uintptr_t a_to);
 }
 
-#include "Settings.h"
+// clang-format off
 #include "Version.h"
+#include "Settings.h"
+// clang-format on
