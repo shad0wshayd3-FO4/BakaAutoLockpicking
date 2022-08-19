@@ -11,7 +11,7 @@ namespace Hooks
 		{
 			REL::Relocation<std::uintptr_t> targetCONT{ REL::ID(879097), 0x1E9 };
 			REL::Relocation<std::uintptr_t> targetDOOR{ REL::ID(1278339), 0x35D };
-			
+
 			auto& trampoline = F4SE::GetTrampoline();
 			trampoline.write_call<5>(targetCONT.address(), TryUnlockObjectImpl);
 			trampoline.write_call<5>(targetDOOR.address(), TryUnlockObjectImpl);
@@ -320,7 +320,7 @@ namespace Hooks
 				logger::info(FMT_STRING("{:s}"), results);
 				RE::SendHUDMessage::ShowHUDMessage(results.data(), "", false, false);
 			}
-			
+
 			if (MCM::Settings::Rolls::bCriticalFailure)
 			{
 				if (RollMin == RollVal)
@@ -333,7 +333,7 @@ namespace Hooks
 						false);
 				}
 			}
-			
+
 			if (MCM::Settings::Rolls::bCriticalSuccess)
 			{
 				if (RollMax == RollVal)

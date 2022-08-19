@@ -3,13 +3,13 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
-#include "RE/Fallout.h"
 #include "F4SE/F4SE.h"
+#include "RE/Fallout.h"
 
 #include <AutoTOML.hpp>
+#include <SimpleIni.h>
 #include <effolkronium/random.hpp>
 #include <fmt/printf.h>
-#include <SimpleIni.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 
@@ -26,5 +26,5 @@ namespace stl
 	void asm_replace(std::uintptr_t a_from, std::size_t a_size, std::uintptr_t a_to);
 }
 
-#include "Version.h"
 #include "Settings.h"
+#include "Version.h"
