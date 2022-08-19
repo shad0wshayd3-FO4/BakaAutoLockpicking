@@ -13,7 +13,7 @@ namespace Papyrus
 			a_vm->BindNativeMethod(CLASS_NAME, "GetVersion", GetVersion, true);
 			a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiers", ShowRollModifiers);
 			a_vm->BindNativeMethod(CLASS_NAME, "UpdateSettings", UpdateSettings);
-			logger::info(FMT_STRING("Registered funcs for class {:s}"), CLASS_NAME);
+			logger::info(FMT_STRING("Registered funcs for class {:s}"sv), CLASS_NAME);
 
 			return true;
 		}

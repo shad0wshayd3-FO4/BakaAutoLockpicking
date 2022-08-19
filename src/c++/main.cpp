@@ -12,7 +12,7 @@ namespace
 			stl::report_and_fail("Failed to find standard logging directory"sv);
 		}
 
-		*path /= fmt::format(FMT_STRING("{:s}.log"), Version::PROJECT);
+		*path /= fmt::format(FMT_STRING("{:s}.log"sv), Version::PROJECT);
 		auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
 
 		auto log = std::make_shared<spdlog::logger>("global log"s, std::move(sink));
@@ -26,7 +26,7 @@ namespace
 		spdlog::set_default_logger(std::move(log));
 		spdlog::set_pattern("[%m/%d/%Y - %T] [%^%l%$] %v"s);
 
-		logger::info(FMT_STRING("{:s} v{:s}"), Version::PROJECT, Version::NAME);
+		logger::info(FMT_STRING("{:s} v{:s}"sv), Version::PROJECT, Version::NAME);
 	}
 
 	void MessageHandler(F4SE::MessagingInterface::Message* a_msg)
@@ -65,7 +65,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	{
 		stl::report_and_fail(
 			fmt::format(
-				FMT_STRING("{:s} does not support runtime v{:s}."),
+				FMT_STRING("{:s} does not support runtime v{:s}."sv),
 				Version::PROJECT,
 				rtv.string()));
 	}
@@ -78,8 +78,8 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 	// Settings::Load();
 	InitializeLog();
 
-	logger::info(FMT_STRING("{:s} loaded."), Version::PROJECT);
-	logger::debug("Debug logging enabled.");
+	logger::info(FMT_STRING("{:s} loaded."sv), Version::PROJECT);
+	logger::debug("Debug logging enabled."sv);
 
 	F4SE::Init(a_F4SE);
 	F4SE::AllocTrampoline(1 << 6);

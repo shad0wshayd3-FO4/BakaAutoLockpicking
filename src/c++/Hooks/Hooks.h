@@ -37,7 +37,7 @@ namespace Hooks
 			auto TotalMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sTotal.data()), TotalVal);
 
 			auto msg = fmt::format(
-				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}</font>"),
+				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
 				SkillMsg,
 				PerksMsg,
 				BonusMsg,
