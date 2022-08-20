@@ -116,7 +116,7 @@ namespace MCM
 			if (auto BSScaleformManager = RE::BSScaleformManager::GetSingleton(); BSScaleformManager && BSScaleformManager->loader)
 			{
 				if (auto BSScaleformTranslator =
-						static_cast<RE::BSScaleformTranslator*>(
+				        static_cast<RE::BSScaleformTranslator*>(
 							BSScaleformManager->loader->GetStateAddRef(
 								RE::Scaleform::GFx::State::StateType::kTranslator)))
 				{
