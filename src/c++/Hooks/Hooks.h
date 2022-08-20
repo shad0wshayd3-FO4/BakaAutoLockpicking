@@ -441,17 +441,25 @@ namespace Hooks
 		static RE::ActorValueInfo* GetSkillFromIndex()
 		{
 			auto ActorValue = RE::ActorValue::GetSingleton();
-			std::vector Skills = {
-				ActorValue->strength,
-				ActorValue->perception,
-				ActorValue->endurance,
-				ActorValue->charisma,
-				ActorValue->intelligence,
-				ActorValue->agility,
-				ActorValue->luck
-			};
-
-			return Skills[MCM::Settings::General::iSkillIndex];
+			switch (MCM::Settings::General::iSkillIndex)
+			{
+				case 0:
+					return ActorValue->strength;
+				case 1:
+					return ActorValue->perception;
+				case 2:
+					return ActorValue->endurance;
+				case 3:
+					return ActorValue->charisma;
+				case 4:
+					return ActorValue->intelligence;
+				case 5:
+					return ActorValue->agility;
+				case 6:
+					return ActorValue->luck;
+				default:
+					return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::General::sSkillName);
+			}
 		}
 
 		static void HandleCrime(RE::TESObjectREFR* a_refr)
@@ -611,7 +619,8 @@ namespace Hooks
 			}
 
 			RE::UIUtils::PlayMenuSound("UILockpickingUnlock");
-			if ((MCM::Settings::General::bActivateContAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kCONT)) || (MCM::Settings::General::bActivateDoorAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kDOOR)))
+			if ((MCM::Settings::General::bActivateContAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kCONT))
+			    || (MCM::Settings::General::bActivateDoorAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kDOOR)))
 			{
 				a_refr->ActivateRef(RE::PlayerCharacter::GetSingleton(), nullptr, 1, false, false, false);
 			}

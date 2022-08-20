@@ -21,6 +21,7 @@ namespace MCM
 			inline static std::int32_t iDetectionEventFailureLevel{ 0 };
 			inline static std::int32_t iDetectionEventSuccessLevel{ 0 };
 			inline static std::int32_t iSkillIndex{ 1 };
+			inline static std::string_view sSkillName{ "Perception" };
 		};
 
 		class Formatting
@@ -75,7 +76,8 @@ namespace MCM
 			GetModSettingBool("General", "bUnbreakableLockpicks", General::bUnbreakableLockpicks);
 			GetModSettingLong("General", "iDetectionEventFailureLevel", General::iDetectionEventFailureLevel);
 			GetModSettingLong("General", "iDetectionEventSuccessLevel", General::iDetectionEventSuccessLevel);
-			// GetModSettingLong("General", "iSkillIndex", General::iSkillIndex);
+			GetModSettingLong("General", "iSkillIndex", General::iSkillIndex);
+			GetModSettingChar("General", "sSkillName", General::sSkillName);
 
 			// Rolls
 			GetModSettingBool("Rolls", "bCriticalFailure", Rolls::bCriticalFailure);
@@ -97,6 +99,13 @@ namespace MCM
 		inline static bool m_FirstRun{ true };
 
 	private:
+		static void GetModSettingChar(const std::string& a_section, const std::string& a_setting, std::string_view& a_value)
+		{
+			auto base = m_ini_base.GetValue(a_section.c_str(), a_setting.c_str(), a_value.data());
+			auto user = m_ini_user.GetValue(a_section.c_str(), a_setting.c_str(), base);
+			a_value = user;
+		}
+
 		static void GetModSettingBool(const std::string& a_section, const std::string& a_setting, bool& a_value)
 		{
 			auto base = m_ini_base.GetBoolValue(a_section.c_str(), a_setting.c_str(), a_value);
