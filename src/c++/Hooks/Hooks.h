@@ -318,7 +318,7 @@ namespace Hooks
 					RollVal,
 					RollMod);
 				logger::info(FMT_STRING("{:s}"), results);
-				RE::SendHUDMessage::ShowHUDMessage(results.data(), "", false, false);
+				RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
 			}
 
 			if (MCM::Settings::Rolls::bCriticalFailure)
@@ -328,7 +328,7 @@ namespace Hooks
 					a_this->currentProcess->KnockExplosion(a_this, a_this->data.location, 5.0f);
 					RE::SendHUDMessage::ShowHUDMessage(
 						MCM::Settings::Formatting::sCriticalFailure.data(),
-						"",
+						nullptr,
 						false,
 						false);
 				}
@@ -341,7 +341,7 @@ namespace Hooks
 					HandleExperience(RE::LOCK_LEVEL::kVeryHard);
 					RE::SendHUDMessage::ShowHUDMessage(
 						MCM::Settings::Formatting::sCriticalSuccess.data(),
-						"",
+						nullptr,
 						false,
 						false);
 				}
