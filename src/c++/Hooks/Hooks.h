@@ -137,6 +137,214 @@ namespace Hooks
 		}
 	};
 
+	class BakaAutoHack
+	{
+	public:
+		static void Install()
+		{
+			REL::Relocation<std::uintptr_t> target{ RE::BGSTerminal::VTABLE[0] };
+			target.write_vfunc(0x00, reinterpret_cast<std::uintptr_t>(hkActivate));
+		}
+
+	private:
+		static bool hkActivate(RE::BGSTerminal* a_this, RE::TESObjectREFR* a_itemActivated, RE::TESObjectREFR* a_actionRef, RE::TESBoundObject*, std::int32_t)
+		{
+			auto actor = static_cast<RE::Actor*>(a_actionRef);
+			if (!actor)
+			{
+				return false;
+			}
+
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			auto bIsActorPlayerC = PlayerCharacter == actor;
+
+			if (actor->interactingState == RE::INTERACTING_STATE::kNotInteracting)
+			{
+				if (RE::BGSTerminal::IsTerminalRefInUse(a_itemActivated))
+				{
+					if (bIsActorPlayerC)
+					{
+						BakaAutoShared::ShowMessage("sObjectInUse");
+					}
+					return false;
+				}
+
+				if (bIsActorPlayerC)
+				{
+					actor->currentProcess->ProcessGreet(
+						actor,
+						RE::DIALOGUE_TYPE::kMiscellaneous,
+						RE::DIALOGUE_SUBTYPE::kMisc_Player_Activate_Terminals,
+						a_itemActivated,
+						nullptr,
+						false,
+						false,
+						false,
+						false);
+				}
+				else if (a_itemActivated->IsAnOwner(actor, true, false))
+				{
+					ActivateObject(actor, a_itemActivated);
+					return true;
+				}
+
+				if (auto Lock = a_itemActivated->GetLock())
+				{
+					if ((Lock->flags & 1) == 0)
+					{
+						ActivateObject(actor, a_itemActivated);
+						return true;
+					}
+
+					auto LockKey = Lock->key;
+					if (LockKey)
+					{
+						if (BakaAutoShared::PlayerHasItem(LockKey))
+						{
+							a_itemActivated->GetLock()->SetLocked(false);
+							a_itemActivated->AddLockChange();
+							ActivateObject(actor, a_itemActivated);
+							return true;
+						}
+					}
+
+					auto LockLvl = a_this->GetHackDifficultyLockLevel(a_itemActivated);
+					switch (LockLvl)
+					{
+						case RE::LOCK_LEVEL::kEasy:
+						case RE::LOCK_LEVEL::kAverage:
+						case RE::LOCK_LEVEL::kHard:
+						case RE::LOCK_LEVEL::kVeryHard:
+							break;
+
+						case RE::LOCK_LEVEL::kRequiresKey:
+							{
+								auto SettingName =
+									LockKey
+										? "sHackingKeyOnly"
+										: "sTerminalPasswordRequired";
+								BakaAutoShared::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
+								return false;
+							}
+
+						case RE::LOCK_LEVEL::kInaccessible:
+							{
+								return false;
+							}
+
+						case RE::LOCK_LEVEL::kTerminal:
+						case RE::LOCK_LEVEL::kBarred:
+						case RE::LOCK_LEVEL::kChained:
+							{
+								return false;
+							}
+
+						default:
+							return false;
+					}
+
+					if (auto handle = a_itemActivated->GetHandle())
+					{
+						if (PlayerCharacter->IsLockedOutOfTerminal(handle))
+						{
+							BakaAutoShared::ShowMessage("sTerminalLockout");
+							return false;
+						}
+					}
+
+					if (RE::GamePlayFormulas::CanHackGateCheck(LockLvl))
+					{
+						ActivateObject(actor, a_itemActivated);
+						return true;
+					}
+
+					BakaAutoShared::ShowMessage("sHackingGateFail");
+					return false;
+				}
+			}
+
+			if (bIsActorPlayerC)
+			{
+				PlayerCharacter->sitHeadingDelta = 0.0f;
+				RE::SitWaitMenu::OnExitFurniture();
+
+				if (PlayerCharacter->currentProcess)
+				{
+					auto furniture = PlayerCharacter->currentProcess->GetOccupiedFurniture();
+					if (furniture)
+					{
+						if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
+						{
+							PlayerCamera->StartFurnitureMode(furniture.get().get());
+						}
+					}
+				}
+			}
+
+			actor->InitiateGetUpPackage();
+			return true;
+		}
+
+		static void HandleCrime(RE::Actor* a_actor, RE::TESObjectREFR* a_terminal)
+		{
+			if (!a_actor)
+			{
+				return;
+			}
+
+			if (a_actor != RE::PlayerCharacter::GetSingleton())
+			{
+				return;
+			}
+
+			if (!a_terminal)
+			{
+				return;
+			}
+
+			if (!a_terminal->GetHasOwner())
+			{
+				return;
+			}
+
+			if (a_terminal->IsAnOwner(a_actor, true, false))
+			{
+				return;
+			}
+
+			if (auto ProcessLists = RE::ProcessLists::GetSingleton())
+			{
+				std::uint32_t LOSCount{ 1 };
+				if (ProcessLists->RequestHighestDetectionLevelAgainstActor(a_actor, LOSCount) > 0)
+				{
+					auto owner = a_terminal->GetOwner();
+					a_actor->TrespassAlarm(a_terminal, owner, -1);
+				}
+			}
+		}
+
+		static void ActivateObject(RE::Actor* a_actor, RE::TESObjectREFR* a_terminal)
+		{
+			if (!a_actor)
+			{
+				return;
+			}
+
+			if (!a_terminal)
+			{
+				return;
+			}
+
+			if (true)
+			{
+				HandleCrime(a_actor, a_terminal);
+			}
+
+			auto furniture = a_terminal->As<RE::TESFurniture>();
+			furniture->Activate(a_terminal, a_actor, nullptr, 0);
+		}
+	};
+
 	class BakaAutoLock
 	{
 	public:

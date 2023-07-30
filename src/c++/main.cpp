@@ -98,6 +98,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 		return false;
 	}
 
+	Hooks::BakaAutoHack::Install();
 	Hooks::BakaAutoLock::Install();
 
 	return true;
