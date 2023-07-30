@@ -9,7 +9,7 @@
     "boost-stl-interfaces",
     "effolkronium-random",
     "fmt",
-    "mmio",
+    "rsm-mmio",
     "simpleini",
     "spdlog",
     "xbyak"
