@@ -200,11 +200,14 @@ namespace Hooks
 			}
 
 		private:
-			static bool HasObjects(void* a_this, void* a_arg2, std::int32_t a_arg3, std::int32_t a_arg4, std::uint32_t a_arg5, std::int32_t& a_arg6)
+			static bool HasObjects(RE::Actor* a_this, void* a_arg2, std::int32_t a_arg3, std::int32_t a_arg4, std::uint32_t a_arg5, std::int32_t& a_arg6)
 			{
 				if (MCM::Settings::General::bIgnoreHasKey)
 				{
-					return false;
+					if (a_this == RE::PlayerCharacter::GetSingleton())
+					{
+						return false;
+					}
 				}
 
 				return _HasObjects(a_this, a_arg2, a_arg3, a_arg4, a_arg5, a_arg6);
