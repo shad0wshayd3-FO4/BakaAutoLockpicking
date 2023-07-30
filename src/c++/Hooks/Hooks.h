@@ -4,6 +4,139 @@
 
 namespace Hooks
 {
+	class BakaAutoShared
+	{
+	public:
+		using Random = effolkronium::random_thread_local;
+
+		static bool PlayerHasItem(RE::TESForm* a_form)
+		{
+			if (!a_form)
+			{
+				return false;
+			}
+
+			if (auto list = a_form->As<RE::BGSListForm>())
+			{
+				return PlayerHasItem(list);
+			}
+
+			if (auto object = a_form->As<RE::TESBoundObject>())
+			{
+				return PlayerHasItem(object);
+			}
+
+			return false;
+		}
+
+		static bool PlayerHasItem(RE::BGSListForm* a_list)
+		{
+			if (!a_list)
+			{
+				return false;
+			}
+
+			for (auto& iter : a_list->arrayOfForms)
+			{
+				if (PlayerHasItem(iter))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		static bool PlayerHasItem(RE::TESBoundObject* a_object)
+		{
+			if (!a_object)
+			{
+				return false;
+			}
+
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			return (PlayerCharacter->GetInventoryObjectCount(a_object) > 0);
+		}
+
+		static bool PlayerHasPerk(RE::TESForm* a_form)
+		{
+			if (!a_form)
+			{
+				return false;
+			}
+
+			if (auto list = a_form->As<RE::BGSListForm>())
+			{
+				return PlayerHasPerk(list);
+			}
+
+			if (auto perk = a_form->As<RE::BGSPerk>())
+			{
+				return PlayerHasPerk(perk);
+			}
+
+			return false;
+		}
+
+		static bool PlayerHasPerk(RE::BGSListForm* a_list)
+		{
+			if (!a_list)
+			{
+				return false;
+			}
+
+			for (auto& iter : a_list->arrayOfForms)
+			{
+				if (PlayerHasPerk(iter))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		static bool PlayerHasPerk(RE::BGSPerk* a_perk)
+		{
+			if (!a_perk)
+			{
+				return false;
+			}
+
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			return (PlayerCharacter->GetPerkRank(a_perk) > 0);
+		}
+
+		static void ShowMessage(const char* a_settingName, std::string_view a_formatText = "", const char* a_sound = nullptr)
+		{
+			auto GameSettingCollection = RE::GameSettingCollection::GetSingleton();
+			if (!GameSettingCollection)
+			{
+				return;
+			}
+
+			auto setting = GameSettingCollection->settings.find(a_settingName);
+			if (setting != GameSettingCollection->settings.end())
+			{
+				if (setting->second)
+				{
+					auto message = setting->second->GetString();
+					if (!message.empty())
+					{
+						if (!a_formatText.empty())
+						{
+							auto formatted = fmt::sprintf(message.data(), a_formatText);
+							RE::SendHUDMessage::ShowHUDMessage(formatted.data(), a_sound, true, true);
+							return;
+						}
+
+						RE::SendHUDMessage::ShowHUDMessage(message.data(), a_sound, true, true);
+					}
+				}
+			}
+		}
+	};
+
 	class BakaAutoLock
 	{
 	public:
@@ -55,139 +188,6 @@ namespace Hooks
 		}
 
 	private:
-		using Random = effolkronium::random_thread_local;
-
-		class detail
-		{
-		public:
-			static bool PlayerHasItem(RE::TESForm* a_form)
-			{
-				if (!a_form)
-				{
-					return false;
-				}
-
-				if (auto list = a_form->As<RE::BGSListForm>())
-				{
-					return PlayerHasItem(list);
-				}
-
-				if (auto object = a_form->As<RE::TESBoundObject>())
-				{
-					return PlayerHasItem(object);
-				}
-
-				return false;
-			}
-
-			static bool PlayerHasItem(RE::BGSListForm* a_list)
-			{
-				if (!a_list)
-				{
-					return false;
-				}
-
-				for (auto& iter : a_list->arrayOfForms)
-				{
-					if (PlayerHasItem(iter))
-					{
-						return true;
-					}
-				}
-
-				return false;
-			}
-
-			static bool PlayerHasItem(RE::TESBoundObject* a_object)
-			{
-				if (!a_object)
-				{
-					return false;
-				}
-
-				auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
-				return (PlayerCharacter->GetInventoryObjectCount(a_object) > 0);
-			}
-
-			static bool PlayerHasPerk(RE::TESForm* a_form)
-			{
-				if (!a_form)
-				{
-					return false;
-				}
-
-				if (auto list = a_form->As<RE::BGSListForm>())
-				{
-					return PlayerHasPerk(list);
-				}
-
-				if (auto perk = a_form->As<RE::BGSPerk>())
-				{
-					return PlayerHasPerk(perk);
-				}
-
-				return false;
-			}
-
-			static bool PlayerHasPerk(RE::BGSListForm* a_list)
-			{
-				if (!a_list)
-				{
-					return false;
-				}
-
-				for (auto& iter : a_list->arrayOfForms)
-				{
-					if (PlayerHasPerk(iter))
-					{
-						return true;
-					}
-				}
-
-				return false;
-			}
-
-			static bool PlayerHasPerk(RE::BGSPerk* a_perk)
-			{
-				if (!a_perk)
-				{
-					return false;
-				}
-
-				auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
-				return (PlayerCharacter->GetPerkRank(a_perk) > 0);
-			}
-
-			static void ShowMessage(const char* a_settingName, std::string_view a_formatText = "", const char* a_sound = nullptr)
-			{
-				auto GameSettingCollection = RE::GameSettingCollection::GetSingleton();
-				if (!GameSettingCollection)
-				{
-					return;
-				}
-
-				auto setting = GameSettingCollection->settings.find(a_settingName);
-				if (setting != GameSettingCollection->settings.end())
-				{
-					if (setting->second)
-					{
-						auto message = setting->second->GetString();
-						if (!message.empty())
-						{
-							if (!a_formatText.empty())
-							{
-								auto formatted = fmt::sprintf(message.data(), a_formatText);
-								RE::SendHUDMessage::ShowHUDMessage(formatted.data(), a_sound, true, true);
-								return;
-							}
-
-							RE::SendHUDMessage::ShowHUDMessage(message.data(), a_sound, true, true);
-						}
-					}
-				}
-			}
-		};
-
 		template<std::uint64_t ID, std::ptrdiff_t OFFSET>
 		class hkHasObjects
 		{
@@ -246,10 +246,10 @@ namespace Hooks
 
 				case RE::LOCK_LEVEL::kRequiresKey:
 					{
-						if (detail::PlayerHasItem(LockKey))
+						if (BakaAutoShared::PlayerHasItem(LockKey))
 						{
 							UnlockObject(a_refr, false);
-							detail::ShowMessage("sOpenWithKey", LockKey->GetFullName());
+							BakaAutoShared::ShowMessage("sOpenWithKey", LockKey->GetFullName());
 							return false;
 						}
 
@@ -257,13 +257,13 @@ namespace Hooks
 							LockKey
 								? "sAutoLockPickKeyOnly"
 								: "sAutoLockPickNoKey";
-						detail::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
+						BakaAutoShared::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
 						return false;
 					}
 
 				case RE::LOCK_LEVEL::kTerminal:
 					{
-						detail::ShowMessage("sAutoLockPickTerminal");
+						BakaAutoShared::ShowMessage("sAutoLockPickTerminal");
 						return false;
 					}
 
@@ -271,7 +271,7 @@ namespace Hooks
 				case RE::LOCK_LEVEL::kBarred:
 				case RE::LOCK_LEVEL::kChained:
 					{
-						detail::ShowMessage("sAutoLockPickInaccessible");
+						BakaAutoShared::ShowMessage("sAutoLockPickInaccessible");
 						return false;
 					}
 
@@ -281,12 +281,12 @@ namespace Hooks
 
 			if (!PlayerHasLockpicks())
 			{
-				detail::ShowMessage("sAutoLockPickNoPicks");
+				BakaAutoShared::ShowMessage("sAutoLockPickNoPicks");
 
-				if (detail::PlayerHasItem(LockKey))
+				if (BakaAutoShared::PlayerHasItem(LockKey))
 				{
 					UnlockObject(a_refr, false);
-					detail::ShowMessage("sOpenWithKey", LockKey->GetFullName());
+					BakaAutoShared::ShowMessage("sOpenWithKey", LockKey->GetFullName());
 				}
 
 				return false;
@@ -296,7 +296,7 @@ namespace Hooks
 			{
 				if (!RE::GamePlayFormulas::CanPickLockGateCheck(LockLvl))
 				{
-					detail::ShowMessage("sAutoLockPickGateFail");
+					BakaAutoShared::ShowMessage("sAutoLockPickGateFail");
 					return false;
 				}
 			}
@@ -311,7 +311,7 @@ namespace Hooks
 			auto RollMin = MCM::Settings::Rolls::iPlayerDiceMin;
 			auto RollMax = std::max(RollMin, MCM::Settings::Rolls::iPlayerDiceMax);
 			auto RollMod = GetRollModifier();
-			auto RollVal = Random::get<std::int32_t>(RollMin, RollMax);
+			auto RollVal = BakaAutoShared::Random::get<std::int32_t>(RollMin, RollMax);
 
 			if (MCM::Settings::General::bShowRollResults)
 			{
@@ -418,7 +418,7 @@ namespace Hooks
 			std::int32_t result{ 0 };
 			for (auto& form : Forms::BakaAutoLock_Perks_Base->arrayOfForms)
 			{
-				if (detail::PlayerHasPerk(form))
+				if (BakaAutoShared::PlayerHasPerk(form))
 				{
 					result += MCM::Settings::Rolls::iBonusPerPerks;
 				}
@@ -519,7 +519,7 @@ namespace Hooks
 						else
 						{
 							PlayerCharacter->TrespassAlarm(a_refr, owner, -1);
-							detail::ShowMessage("sLockpickingCaught");
+							BakaAutoShared::ShowMessage("sLockpickingCaught");
 						}
 					}
 				}
@@ -538,7 +538,7 @@ namespace Hooks
 			{
 				for (auto& iter : Forms::BakaAutoLock_Items_Lockpick->arrayOfForms)
 				{
-					if (detail::PlayerHasItem(iter))
+					if (BakaAutoShared::PlayerHasItem(iter))
 					{
 						RE::UIUtils::PlayMenuSound("UILockpickingPickBreak");
 
@@ -558,7 +558,7 @@ namespace Hooks
 		{
 			if (a_key && PlayerHasWaxKey())
 			{
-				if (!detail::PlayerHasItem(a_key))
+				if (!BakaAutoShared::PlayerHasItem(a_key))
 				{
 					auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
 					PlayerCharacter->AddObjectToContainer(
@@ -578,7 +578,7 @@ namespace Hooks
 				return false;
 			}
 
-			if (detail::PlayerHasPerk(Forms::BakaAutoLock_Perks_Unbreakable))
+			if (BakaAutoShared::PlayerHasPerk(Forms::BakaAutoLock_Perks_Unbreakable))
 			{
 				return false;
 			}
@@ -588,7 +588,7 @@ namespace Hooks
 
 		static bool PlayerHasLockpicks()
 		{
-			return detail::PlayerHasItem(Forms::BakaAutoLock_Items_Lockpick);
+			return BakaAutoShared::PlayerHasItem(Forms::BakaAutoLock_Items_Lockpick);
 		}
 
 		static bool PlayerHasWaxKey()
@@ -598,7 +598,7 @@ namespace Hooks
 				return true;
 			}
 
-			return detail::PlayerHasPerk(Forms::BakaAutoLock_Perks_WaxKey);
+			return BakaAutoShared::PlayerHasPerk(Forms::BakaAutoLock_Perks_WaxKey);
 		}
 
 		static void UnlockObject(RE::TESObjectREFR* a_refr, bool a_picked = true)
