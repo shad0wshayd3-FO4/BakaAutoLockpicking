@@ -245,13 +245,10 @@ namespace Hooks
 
 				if (!MCM::Settings::HackGeneral::bNoTimeouts)
 				{
-					if (auto handle = a_itemActivated->GetHandle())
+					if (PlayerCharacter->IsLockedOutOfTerminal(a_itemActivated->GetHandle()))
 					{
-						if (PlayerCharacter->IsLockedOutOfTerminal(handle))
-						{
-							BakaAutoShared::ShowMessage("sTerminalLockout");
-							return false;
-						}
+						BakaAutoShared::ShowMessage("sTerminalLockout");
+						return false;
 					}
 				}
 
@@ -535,6 +532,27 @@ namespace Hooks
 
 		static void UnlockObjectFail(RE::TESObjectREFR* a_terminal)
 		{
+			if (!MCM::Settings::HackGeneral::bNoTimeouts)
+			{
+				float HackingGuesses = 4.0f;
+				RE::BGSEntryPoint::HandleEntryPoint(
+					RE::BGSEntryPoint::ENTRY_POINT::kModHackingGuesses,
+					RE::PlayerCharacter::GetSingleton(),
+					&HackingGuesses);
+
+				float HackingAttempt = a_terminal->GetActorValue(*Forms::BakaAutoHack_Attempts);
+				if (++HackingAttempt >= HackingGuesses)
+				{
+					a_terminal->SetActorValue(*Forms::BakaAutoHack_Attempts, 0.0f);
+					RE::PlayerCharacter::GetSingleton()->LockOutOfTerminal(a_terminal->GetHandle());
+					BakaAutoShared::ShowMessage("sTerminalLockout");
+				}
+				else
+				{
+					a_terminal->SetActorValue(*Forms::BakaAutoHack_Attempts, HackingAttempt);
+				}
+			}
+
 			if (auto BGSStoryEventManager = RE::BGSStoryEventManager::GetSingleton())
 			{
 				RE::BGSHackTerminal BGSHackTerminal{ a_terminal, 0 };
