@@ -5,7 +5,7 @@ namespace MCM
 	class Settings
 	{
 	public:
-		class General
+		class LockGeneral
 		{
 		public:
 			inline static bool bActivateContAfterPick{ false };
@@ -24,24 +24,9 @@ namespace MCM
 			inline static std::string_view sSkillName{ "Perception" };
 		};
 
-		class Formatting
+		class LockRolls
 		{
 		public:
-			inline static std::string sBonus;
-			inline static std::string sPerks;
-			inline static std::string sSkill;
-			inline static std::string sTotal;
-			inline static std::string sCriticalFailure;
-			inline static std::string sCriticalSuccess;
-			inline static std::string sShowRollResults;
-		};
-
-		class Rolls
-		{
-		public:
-			inline static bool bCriticalFailure{ false };
-			inline static bool bCriticalSuccess{ true };
-
 			inline static std::int32_t iDCNovice{ 8 };
 			inline static std::int32_t iDCAdvanced{ 12 };
 			inline static std::int32_t iDCExpert{ 16 };
@@ -51,6 +36,48 @@ namespace MCM
 			inline static std::int32_t iBonusPerBonus{ 0 };
 			inline static std::int32_t iBonusPerPerks{ 1 };
 			inline static std::int32_t iBonusPerSkill{ 2 };
+		};
+
+		class HackGeneral
+		{
+		public:
+			inline static bool bActivateTermAfterHack{ true };
+			inline static bool bGivePass{ false };
+			inline static bool bIgnoreHasPass{ false };
+			inline static bool bIgnoreHackGates{ false };
+			inline static bool bHackingCrimeCheck{ true };
+			inline static bool bModEnabled{ true };
+			inline static bool bShowRollResults{ false };
+			inline static bool bNoTimeouts{ false };
+
+			inline static std::int32_t iDetectionEventFailureLevel{ 0 };
+			inline static std::int32_t iDetectionEventSuccessLevel{ 0 };
+			inline static std::int32_t iSkillIndex{ 4 };
+			inline static std::string_view sSkillName{ "Intelligence" };
+		};
+
+		class HackRolls
+		{
+		public:
+			inline static std::int32_t iDCNovice{ 8 };
+			inline static std::int32_t iDCAdvanced{ 12 };
+			inline static std::int32_t iDCExpert{ 16 };
+			inline static std::int32_t iDCMaster{ 20 };
+			inline static std::int32_t iPlayerDiceMin{ 1 };
+			inline static std::int32_t iPlayerDiceMax{ 20 };
+			inline static std::int32_t iBonusPerBonus{ 0 };
+			inline static std::int32_t iBonusPerPerks{ 1 };
+			inline static std::int32_t iBonusPerSkill{ 2 };
+		};
+
+		class Formatting
+		{
+		public:
+			inline static std::string sBonus;
+			inline static std::string sPerks;
+			inline static std::string sSkill;
+			inline static std::string sTotal;
+			inline static std::string sShowRollResults;
 		};
 
 		static void Update()
@@ -64,33 +91,56 @@ namespace MCM
 			m_ini_base.LoadFile("Data/MCM/Config/BakaAutoLockpicking/settings.ini");
 			m_ini_user.LoadFile("Data/MCM/Settings/BakaAutoLockpicking.ini");
 
-			// General
-			GetModSettingBool("General", "bActivateContAfterPick", General::bActivateContAfterPick);
-			GetModSettingBool("General", "bActivateDoorAfterPick", General::bActivateDoorAfterPick);
-			GetModSettingBool("General", "bGiveWaxKeys", General::bGiveWaxKeys);
-			GetModSettingBool("General", "bIgnoreHasKey", General::bIgnoreHasKey);
-			GetModSettingBool("General", "bIgnoreLockGates", General::bIgnoreLockGates);
-			GetModSettingBool("General", "bLockpickingCrimeCheck", General::bLockpickingCrimeCheck);
-			GetModSettingBool("General", "bModEnabled", General::bModEnabled);
-			GetModSettingBool("General", "bShowRollResults", General::bShowRollResults);
-			GetModSettingBool("General", "bUnbreakableLockpicks", General::bUnbreakableLockpicks);
-			GetModSettingLong("General", "iDetectionEventFailureLevel", General::iDetectionEventFailureLevel);
-			GetModSettingLong("General", "iDetectionEventSuccessLevel", General::iDetectionEventSuccessLevel);
-			GetModSettingLong("General", "iSkillIndex", General::iSkillIndex);
-			GetModSettingChar("General", "sSkillName", General::sSkillName);
+			// LockGeneral
+			GetModSettingBool("LockGeneral", "bActivateContAfterPick", LockGeneral::bActivateContAfterPick);
+			GetModSettingBool("LockGeneral", "bActivateDoorAfterPick", LockGeneral::bActivateDoorAfterPick);
+			GetModSettingBool("LockGeneral", "bGiveWaxKeys", LockGeneral::bGiveWaxKeys);
+			GetModSettingBool("LockGeneral", "bIgnoreHasKey", LockGeneral::bIgnoreHasKey);
+			GetModSettingBool("LockGeneral", "bIgnoreLockGates", LockGeneral::bIgnoreLockGates);
+			GetModSettingBool("LockGeneral", "bLockpickingCrimeCheck", LockGeneral::bLockpickingCrimeCheck);
+			GetModSettingBool("LockGeneral", "bModEnabled", LockGeneral::bModEnabled);
+			GetModSettingBool("LockGeneral", "bShowRollResults", LockGeneral::bShowRollResults);
+			GetModSettingBool("LockGeneral", "bUnbreakableLockpicks", LockGeneral::bUnbreakableLockpicks);
+			GetModSettingLong("LockGeneral", "iDetectionEventFailureLevel", LockGeneral::iDetectionEventFailureLevel);
+			GetModSettingLong("LockGeneral", "iDetectionEventSuccessLevel", LockGeneral::iDetectionEventSuccessLevel);
+			GetModSettingLong("LockGeneral", "iSkillIndex", LockGeneral::iSkillIndex);
+			GetModSettingChar("LockGeneral", "sSkillName", LockGeneral::sSkillName);
 
-			// Rolls
-			GetModSettingBool("Rolls", "bCriticalFailure", Rolls::bCriticalFailure);
-			GetModSettingBool("Rolls", "bCriticalSuccess", Rolls::bCriticalSuccess);
-			GetModSettingLong("Rolls", "iDCNovice", Rolls::iDCNovice);
-			GetModSettingLong("Rolls", "iDCAdvanced", Rolls::iDCAdvanced);
-			GetModSettingLong("Rolls", "iDCExpert", Rolls::iDCExpert);
-			GetModSettingLong("Rolls", "iDCMaster", Rolls::iDCMaster);
-			GetModSettingLong("Rolls", "iPlayerDiceMin", Rolls::iPlayerDiceMin);
-			GetModSettingLong("Rolls", "iPlayerDiceMax", Rolls::iPlayerDiceMax);
-			GetModSettingLong("Rolls", "iBonusPerBonus", Rolls::iBonusPerBonus);
-			GetModSettingLong("Rolls", "iBonusPerPerks", Rolls::iBonusPerPerks);
-			GetModSettingLong("Rolls", "iBonusPerSkill", Rolls::iBonusPerSkill);
+			// LockRolls
+			GetModSettingLong("LockRolls", "iDCNovice", LockRolls::iDCNovice);
+			GetModSettingLong("LockRolls", "iDCAdvanced", LockRolls::iDCAdvanced);
+			GetModSettingLong("LockRolls", "iDCExpert", LockRolls::iDCExpert);
+			GetModSettingLong("LockRolls", "iDCMaster", LockRolls::iDCMaster);
+			GetModSettingLong("LockRolls", "iPlayerDiceMin", LockRolls::iPlayerDiceMin);
+			GetModSettingLong("LockRolls", "iPlayerDiceMax", LockRolls::iPlayerDiceMax);
+			GetModSettingLong("LockRolls", "iBonusPerBonus", LockRolls::iBonusPerBonus);
+			GetModSettingLong("LockRolls", "iBonusPerPerks", LockRolls::iBonusPerPerks);
+			GetModSettingLong("LockRolls", "iBonusPerSkill", LockRolls::iBonusPerSkill);
+
+			// HackGeneral
+			GetModSettingBool("HackGeneral", "bActivateTermAfterHack", HackGeneral::bActivateTermAfterHack);
+			GetModSettingBool("HackGeneral", "bGivePass", HackGeneral::bGivePass);
+			GetModSettingBool("HackGeneral", "bIgnoreHasPass", HackGeneral::bIgnoreHasPass);
+			GetModSettingBool("HackGeneral", "bIgnoreHackGates", HackGeneral::bIgnoreHackGates);
+			GetModSettingBool("HackGeneral", "bHackingCrimeCheck", HackGeneral::bHackingCrimeCheck);
+			GetModSettingBool("HackGeneral", "bModEnabled", HackGeneral::bModEnabled);
+			GetModSettingBool("HackGeneral", "bShowRollResults", HackGeneral::bShowRollResults);
+			GetModSettingBool("HackGeneral", "bNoTimeouts", HackGeneral::bNoTimeouts);
+			GetModSettingLong("HackGeneral", "iDetectionEventFailureLevel", HackGeneral::iDetectionEventFailureLevel);
+			GetModSettingLong("HackGeneral", "iDetectionEventSuccessLevel", HackGeneral::iDetectionEventSuccessLevel);
+			GetModSettingLong("HackGeneral", "iSkillIndex", HackGeneral::iSkillIndex);
+			GetModSettingChar("HackGeneral", "sSkillName", HackGeneral::sSkillName);
+
+			// HackRolls
+			GetModSettingLong("HackRolls", "iDCNovice", HackRolls::iDCNovice);
+			GetModSettingLong("HackRolls", "iDCAdvanced", HackRolls::iDCAdvanced);
+			GetModSettingLong("HackRolls", "iDCExpert", HackRolls::iDCExpert);
+			GetModSettingLong("HackRolls", "iDCMaster", HackRolls::iDCMaster);
+			GetModSettingLong("HackRolls", "iPlayerDiceMin", HackRolls::iPlayerDiceMin);
+			GetModSettingLong("HackRolls", "iPlayerDiceMax", HackRolls::iPlayerDiceMax);
+			GetModSettingLong("HackRolls", "iBonusPerBonus", HackRolls::iBonusPerBonus);
+			GetModSettingLong("HackRolls", "iBonusPerPerks", HackRolls::iBonusPerPerks);
+			GetModSettingLong("HackRolls", "iBonusPerSkill", HackRolls::iBonusPerSkill);
 
 			m_ini_base.Reset();
 			m_ini_user.Reset();
@@ -143,8 +193,6 @@ namespace MCM
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Perks", Formatting::sPerks);
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Skill", Formatting::sSkill);
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Total", Formatting::sTotal);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_CriticalFailure", Formatting::sCriticalFailure);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_CriticalSuccess", Formatting::sCriticalSuccess);
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_ShowRollResults", Formatting::sShowRollResults);
 				}
 			}
