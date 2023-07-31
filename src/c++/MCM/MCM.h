@@ -117,6 +117,7 @@ namespace MCM
 			GetModSettingLong("LockRolls", "iPlayerDiceMin", LockRolls::iPlayerDiceMin);
 			GetModSettingLong("LockRolls", "iPlayerDiceMax", LockRolls::iPlayerDiceMax);
 			GetModSettingLong("LockRolls", "iBonusPerBonus", LockRolls::iBonusPerBonus);
+			GetModSettingLong("LockRolls", "iBonusPerLucky", LockRolls::iBonusPerLucky);
 			GetModSettingLong("LockRolls", "iBonusPerPerks", LockRolls::iBonusPerPerks);
 			GetModSettingLong("LockRolls", "iBonusPerSkill", LockRolls::iBonusPerSkill);
 
@@ -142,6 +143,7 @@ namespace MCM
 			GetModSettingLong("HackRolls", "iPlayerDiceMin", HackRolls::iPlayerDiceMin);
 			GetModSettingLong("HackRolls", "iPlayerDiceMax", HackRolls::iPlayerDiceMax);
 			GetModSettingLong("HackRolls", "iBonusPerBonus", HackRolls::iBonusPerBonus);
+			GetModSettingLong("HackRolls", "iBonusPerLucky", HackRolls::iBonusPerLucky);
 			GetModSettingLong("HackRolls", "iBonusPerPerks", HackRolls::iBonusPerPerks);
 			GetModSettingLong("HackRolls", "iBonusPerSkill", HackRolls::iBonusPerSkill);
 
