@@ -10,6 +10,7 @@ namespace Forms
 	inline RE::BGSListForm* BakaAutoLock_Items_Lockpick{ nullptr };
 
 	inline RE::BGSListForm* BakaAutoHack_Perks_Base{ nullptr };
+	inline RE::BGSListForm* BakaAutoHack_Perks_WaxKey{ nullptr };
 
 	inline RE::ActorValueInfo* LGND_LockPickSweetSpot{ nullptr };
 
@@ -30,6 +31,8 @@ namespace Forms
 
 				BakaAutoHack_Perks_Base =
 					TESDataHandler->LookupForm<RE::BGSListForm>(0x806, PLUGIN_NAME);
+				BakaAutoHack_Perks_WaxKey =
+					TESDataHandler->LookupForm<RE::BGSListForm>(0x807, PLUGIN_NAME);
 
 				LGND_LockPickSweetSpot =
 					TESDataHandler->LookupForm<RE::ActorValueInfo>(0x1F3CAB, "Fallout4.esm");

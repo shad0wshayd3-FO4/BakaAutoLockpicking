@@ -511,7 +511,7 @@ namespace Hooks
 				return true;
 			}
 
-			return false;
+			return BakaAutoShared::PlayerHasPerk(Forms::BakaAutoHack_Perks_WaxKey);
 		}
 
 		static void UnlockObject(RE::TESObjectREFR* a_terminal)
