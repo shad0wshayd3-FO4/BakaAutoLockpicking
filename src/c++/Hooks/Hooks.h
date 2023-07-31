@@ -146,6 +146,40 @@ namespace Hooks
 			_Activate = target.write_vfunc(0x40, reinterpret_cast<std::uintptr_t>(hkActivate));
 		}
 
+		static void ShowRollModifiers()
+		{
+			MCM::Settings::Update();
+
+			auto SkillVal = GetRollModifier_Skill();
+			auto SkillMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sSkill.data()), SkillVal);
+
+			auto PerksVal = GetRollModifier_Perks();
+			auto PerksMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sPerks.data()), PerksVal);
+
+			auto BonusVal = GetRollModifier_Bonus();
+			auto BonusMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sBonus.data()), BonusVal);
+
+			auto TotalVal = SkillVal + PerksVal + BonusVal;
+			auto TotalMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sTotal.data()), TotalVal);
+
+			auto msg = fmt::format(
+				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
+				SkillMsg,
+				PerksMsg,
+				BonusMsg,
+				TotalMsg);
+
+			if (auto MessageMenuManager = RE::MessageMenuManager::GetSingleton())
+			{
+				MessageMenuManager->Create(
+					"",
+					msg.data(),
+					nullptr,
+					RE::WARNING_TYPES::kDefault,
+					"$OK");
+			}
+		}
+
 	private:
 		static bool hkActivate(RE::BGSTerminal* a_this, RE::TESObjectREFR* a_itemActivated, RE::TESObjectREFR* a_actionRef, RE::TESBoundObject* a_objectToGet, std::int32_t a_count)
 		{
@@ -153,6 +187,11 @@ namespace Hooks
 			if (!PlayerCharacter || PlayerCharacter != a_actionRef)
 			{
 				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+			}
+
+			if (MCM::Settings::m_FirstRun)
+			{
+				MCM::Settings::Update();
 			}
 
 			if (!MCM::Settings::HackGeneral::bModEnabled)
@@ -561,7 +600,7 @@ namespace Hooks
 		private:
 			static bool HasObjects(RE::Actor* a_this, void* a_arg2, std::int32_t a_arg3, std::int32_t a_arg4, std::uint32_t a_arg5, std::int32_t& a_arg6)
 			{
-				if (MCM::Settings::General::bIgnoreHasKey)
+				if (MCM::Settings::LockGeneral::bIgnoreHasKey)
 				{
 					if (a_this == RE::PlayerCharacter::GetSingleton())
 					{

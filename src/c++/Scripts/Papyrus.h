@@ -12,6 +12,7 @@ namespace Papyrus
 		{
 			a_vm->BindNativeMethod(CLASS_NAME, "GetVersion", GetVersion, true);
 			a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiers", ShowRollModifiers);
+			a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiersHack", ShowRollModifiersHack);
 			a_vm->BindNativeMethod(CLASS_NAME, "UpdateSettings", UpdateSettings);
 			logger::info(FMT_STRING("Registered funcs for class {:s}"sv), CLASS_NAME);
 
@@ -34,6 +35,11 @@ namespace Papyrus
 		static void ShowRollModifiers(std::monostate)
 		{
 			Hooks::BakaAutoLock::ShowRollModifiers();
+		}
+
+		static void ShowRollModifiersHack(std::monostate)
+		{
+			Hooks::BakaAutoHack::ShowRollModifiers();
 		}
 
 		static void UpdateSettings(std::monostate)
