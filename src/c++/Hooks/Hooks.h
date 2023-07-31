@@ -143,106 +143,65 @@ namespace Hooks
 		static void Install()
 		{
 			REL::Relocation<std::uintptr_t> target{ RE::BGSTerminal::VTABLE[0] };
-			target.write_vfunc(0x00, reinterpret_cast<std::uintptr_t>(hkActivate));
+			_Activate = target.write_vfunc(0x40, reinterpret_cast<std::uintptr_t>(hkActivate));
 		}
 
 	private:
-		static bool hkActivate(RE::BGSTerminal* a_this, RE::TESObjectREFR* a_itemActivated, RE::TESObjectREFR* a_actionRef, RE::TESBoundObject*, std::int32_t)
+		static bool hkActivate(RE::BGSTerminal* a_this, RE::TESObjectREFR* a_itemActivated, RE::TESObjectREFR* a_actionRef, RE::TESBoundObject* a_objectToGet, std::int32_t a_count)
 		{
-			auto actor = static_cast<RE::Actor*>(a_actionRef);
-			if (!actor)
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			if (!PlayerCharacter || PlayerCharacter != a_actionRef)
 			{
-				return false;
+				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 			}
 
-			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
-			auto bIsActorPlayerC = PlayerCharacter == actor;
-
-			if (actor->interactingState == RE::INTERACTING_STATE::kNotInteracting)
+			if (!MCM::Settings::General::bModEnabled)
 			{
-				if (RE::BGSTerminal::IsTerminalRefInUse(a_itemActivated))
+				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+			}
+
+			if (PlayerCharacter->interactingState != RE::INTERACTING_STATE::kNotInteracting)
+			{
+				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+			}
+
+			if (RE::BGSTerminal::IsTerminalRefInUse(a_itemActivated))
+			{
+				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+			}
+
+			if (auto Lock = a_itemActivated->GetLock())
+			{
+				if ((Lock->flags & 1) == 0)
 				{
-					if (bIsActorPlayerC)
-					{
-						BakaAutoShared::ShowMessage("sObjectInUse");
-					}
-					return false;
+					return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 				}
 
-				if (bIsActorPlayerC)
+				auto LockKey = Lock->key;
+				auto LockLvl = a_this->GetHackDifficultyLockLevel(a_itemActivated);
+				switch (LockLvl)
 				{
-					actor->currentProcess->ProcessGreet(
-						actor,
-						RE::DIALOGUE_TYPE::kMiscellaneous,
-						RE::DIALOGUE_SUBTYPE::kMisc_Player_Activate_Terminals,
-						a_itemActivated,
-						nullptr,
-						false,
-						false,
-						false,
-						false);
-				}
-				else if (a_itemActivated->IsAnOwner(actor, true, false))
-				{
-					ActivateObject(actor, a_itemActivated);
-					return true;
-				}
-
-				if (auto Lock = a_itemActivated->GetLock())
-				{
-					if ((Lock->flags & 1) == 0)
-					{
-						ActivateObject(actor, a_itemActivated);
-						return true;
-					}
-
-					auto LockKey = Lock->key;
-					if (LockKey)
-					{
-						if (BakaAutoShared::PlayerHasItem(LockKey))
+					case RE::LOCK_LEVEL::kEasy:
+					case RE::LOCK_LEVEL::kAverage:
+					case RE::LOCK_LEVEL::kHard:
+					case RE::LOCK_LEVEL::kVeryHard:
 						{
-							a_itemActivated->GetLock()->SetLocked(false);
-							a_itemActivated->AddLockChange();
-							ActivateObject(actor, a_itemActivated);
-							return true;
-						}
-					}
-
-					auto LockLvl = a_this->GetHackDifficultyLockLevel(a_itemActivated);
-					switch (LockLvl)
-					{
-						case RE::LOCK_LEVEL::kEasy:
-						case RE::LOCK_LEVEL::kAverage:
-						case RE::LOCK_LEVEL::kHard:
-						case RE::LOCK_LEVEL::kVeryHard:
+							if (!MCM::Settings::General::bIgnoreHasKey)
+							{
+								if (LockKey && BakaAutoShared::PlayerHasItem(LockKey))
+								{
+									return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+								}
+							}
 							break;
+						}
 
-						case RE::LOCK_LEVEL::kRequiresKey:
-							{
-								auto SettingName =
-									LockKey
-										? "sHackingKeyOnly"
-										: "sTerminalPasswordRequired";
-								BakaAutoShared::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
-								return false;
-							}
+					default:
+						return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+				}
 
-						case RE::LOCK_LEVEL::kInaccessible:
-							{
-								return false;
-							}
-
-						case RE::LOCK_LEVEL::kTerminal:
-						case RE::LOCK_LEVEL::kBarred:
-						case RE::LOCK_LEVEL::kChained:
-							{
-								return false;
-							}
-
-						default:
-							return false;
-					}
-
+				if (!MCM::Settings::General::bUnbreakableLockpicks)
+				{
 					if (auto handle = a_itemActivated->GetHandle())
 					{
 						if (PlayerCharacter->IsLockedOutOfTerminal(handle))
@@ -251,52 +210,158 @@ namespace Hooks
 							return false;
 						}
 					}
+				}
 
-					if (RE::GamePlayFormulas::CanHackGateCheck(LockLvl))
+				if (!MCM::Settings::General::bIgnoreLockGates)
+				{
+					if (!RE::GamePlayFormulas::CanHackGateCheck(LockLvl))
 					{
-						ActivateObject(actor, a_itemActivated);
+						BakaAutoShared::ShowMessage("sHackingGateFail");
+						return false;
+					}
+				}
+
+				auto LockVal = GetLockDifficultyClass(LockLvl);
+				auto RollMin = MCM::Settings::Rolls::iPlayerDiceMin;
+				auto RollMax = std::max(RollMin, MCM::Settings::Rolls::iPlayerDiceMax);
+				auto RollMod = GetRollModifier();
+				auto RollVal = BakaAutoShared::Random::get<std::int32_t>(RollMin, RollMax);
+
+				if (MCM::Settings::General::bShowRollResults)
+				{
+					auto results = fmt::format(
+						fmt::runtime(MCM::Settings::Formatting::sShowRollResults.data()),
+						LockVal,
+						RollVal,
+						RollMod);
+					logger::info(FMT_STRING("{:s}"), results);
+					RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
+				}
+
+				RollVal += RollMod;
+				if (RollVal >= LockVal)
+				{
+					UnlockObject(a_itemActivated);
+					HandleExperience(LockLvl);
+					HandleWaxKey(LockKey);
+
+					if (MCM::Settings::General::iDetectionEventSuccessLevel)
+					{
+						PlayerCharacter->currentProcess->SetActorsDetectionEvent(
+							PlayerCharacter,
+							a_itemActivated->data.location,
+							MCM::Settings::General::iDetectionEventSuccessLevel,
+							a_itemActivated);
+					}
+
+					if (MCM::Settings::General::bActivateDoorAfterPick)
+					{
+						return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+					}
+					else
+					{
+						HandlePostActivate(a_itemActivated);
 						return true;
 					}
-
-					BakaAutoShared::ShowMessage("sHackingGateFail");
-					return false;
 				}
-			}
-
-			if (bIsActorPlayerC)
-			{
-				PlayerCharacter->sitHeadingDelta = 0.0f;
-				RE::SitWaitMenu::OnExitFurniture();
-
-				if (PlayerCharacter->currentProcess)
+				else
 				{
-					auto furniture = PlayerCharacter->currentProcess->GetOccupiedFurniture();
-					if (furniture)
+					UnlockObjectFail(a_itemActivated);
+
+					if (MCM::Settings::General::iDetectionEventFailureLevel)
 					{
-						if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
-						{
-							PlayerCamera->StartFurnitureMode(furniture.get().get());
-						}
+						PlayerCharacter->currentProcess->SetActorsDetectionEvent(
+							PlayerCharacter,
+							a_itemActivated->data.location,
+							MCM::Settings::General::iDetectionEventFailureLevel,
+							a_itemActivated);
 					}
+
+					HandlePostActivate(a_itemActivated);
+					return true;
 				}
 			}
 
-			actor->InitiateGetUpPackage();
-			return true;
+			return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 		}
 
-		static void HandleCrime(RE::Actor* a_actor, RE::TESObjectREFR* a_terminal)
+		static std::int32_t GetLockDifficultyClass(RE::LOCK_LEVEL a_lockLevel)
 		{
-			if (!a_actor)
+			switch (a_lockLevel)
 			{
-				return;
+				case RE::LOCK_LEVEL::kAverage:
+					return MCM::Settings::Rolls::iDCAdvanced;
+				case RE::LOCK_LEVEL::kHard:
+					return MCM::Settings::Rolls::iDCExpert;
+				case RE::LOCK_LEVEL::kVeryHard:
+					return MCM::Settings::Rolls::iDCMaster;
+				default:
+					return MCM::Settings::Rolls::iDCNovice;
+			}
+		}
+
+		static std::int32_t GetRollModifier_Skill()
+		{
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
+
+			return static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::Rolls::iBonusPerSkill));
+		}
+
+		static std::int32_t GetRollModifier_Perks()
+		{
+			std::int32_t result{ 0 };
+			for (auto& form : Forms::BakaAutoLock_Perks_Base->arrayOfForms)
+			{
+				if (BakaAutoShared::PlayerHasPerk(form))
+				{
+					result += MCM::Settings::Rolls::iBonusPerPerks;
+				}
 			}
 
-			if (a_actor != RE::PlayerCharacter::GetSingleton())
-			{
-				return;
-			}
+			return result;
+		}
 
+		static std::int32_t GetRollModifier_Bonus()
+		{
+			return MCM::Settings::Rolls::iBonusPerBonus;
+		}
+
+		static std::int32_t GetRollModifier()
+		{
+			std::int32_t result{ 0 };
+			result += GetRollModifier_Skill();
+			result += GetRollModifier_Perks();
+			result += GetRollModifier_Bonus();
+			return result;
+		}
+
+		static RE::ActorValueInfo* GetSkillFromIndex()
+		{
+			auto ActorValue = RE::ActorValue::GetSingleton();
+			switch (MCM::Settings::General::iSkillIndex)
+			{
+				case 0:
+					return ActorValue->strength;
+				case 1:
+					return ActorValue->perception;
+				case 2:
+					return ActorValue->endurance;
+				case 3:
+					return ActorValue->charisma;
+				case 4:
+					return ActorValue->intelligence;
+				case 5:
+					return ActorValue->agility;
+				case 6:
+					return ActorValue->luck;
+				default:
+					return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::General::sSkillName);
+			}
+		}
+
+		static void HandleCrime(RE::TESObjectREFR* a_terminal)
+		{
 			if (!a_terminal)
 			{
 				return;
@@ -307,7 +372,8 @@ namespace Hooks
 				return;
 			}
 
-			if (a_terminal->IsAnOwner(a_actor, true, false))
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			if (a_terminal->IsAnOwner(PlayerCharacter, true, false))
 			{
 				return;
 			}
@@ -315,34 +381,119 @@ namespace Hooks
 			if (auto ProcessLists = RE::ProcessLists::GetSingleton())
 			{
 				std::uint32_t LOSCount{ 1 };
-				if (ProcessLists->RequestHighestDetectionLevelAgainstActor(a_actor, LOSCount) > 0)
+				if (ProcessLists->RequestHighestDetectionLevelAgainstActor(PlayerCharacter, LOSCount) > 0)
 				{
 					auto owner = a_terminal->GetOwner();
-					a_actor->TrespassAlarm(a_terminal, owner, -1);
+					PlayerCharacter->TrespassAlarm(a_terminal, owner, -1);
 				}
 			}
 		}
 
-		static void ActivateObject(RE::Actor* a_actor, RE::TESObjectREFR* a_terminal)
+		static void HandleExperience(RE::LOCK_LEVEL a_lockLevel)
 		{
-			if (!a_actor)
+			RE::DIFFICULTY_LEVEL Difficulty{ RE::DIFFICULTY_LEVEL::kEasy };
+			switch (a_lockLevel)
 			{
-				return;
+				case RE::LOCK_LEVEL::kAverage:
+					Difficulty = RE::DIFFICULTY_LEVEL::kNormal;
+					break;
+				case RE::LOCK_LEVEL::kHard:
+					Difficulty = RE::DIFFICULTY_LEVEL::kHard;
+					break;
+				case RE::LOCK_LEVEL::kVeryHard:
+					Difficulty = RE::DIFFICULTY_LEVEL::kVeryHard;
+					break;
+				default:
+					break;
 			}
 
-			if (!a_terminal)
-			{
-				return;
-			}
-
-			if (true)
-			{
-				HandleCrime(a_actor, a_terminal);
-			}
-
-			auto furniture = a_terminal->As<RE::TESFurniture>();
-			furniture->Activate(a_terminal, a_actor, nullptr, 0);
+			auto reward =
+				RE::GamePlayFormulas::GetExperienceReward(
+					RE::GamePlayFormulas::EXPERIENCE_ACTIVITY::kHackComputer,
+					Difficulty,
+					-1.0f);
+			RE::PlayerCharacter::GetSingleton()->RewardExperience(reward, false, nullptr, nullptr);
 		}
+
+		static void HandlePostActivate(RE::TESObjectREFR* a_terminal)
+		{
+			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+			PlayerCharacter->currentProcess->ProcessGreet(
+				PlayerCharacter,
+				RE::DIALOGUE_TYPE::kMiscellaneous,
+				RE::DIALOGUE_SUBTYPE::kMisc_Player_Activate_Terminals,
+				a_terminal,
+				nullptr,
+				false,
+				false,
+				false,
+				false);
+
+			if (MCM::Settings::General::bLockpickingCrimeCheck)
+			{
+				HandleCrime(a_terminal);
+			}
+		}
+
+		static void HandleWaxKey(RE::TESKey* a_key)
+		{
+			if (a_key && PlayerHasWaxKey())
+			{
+				if (!BakaAutoShared::PlayerHasItem(a_key))
+				{
+					auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
+					PlayerCharacter->AddObjectToContainer(
+						a_key,
+						nullptr,
+						1,
+						nullptr,
+						RE::ITEM_REMOVE_REASON::kNone);
+				}
+			}
+		}
+
+		static bool PlayerHasWaxKey()
+		{
+			if (MCM::Settings::General::bGiveWaxKeys)
+			{
+				return true;
+			}
+
+			return BakaAutoShared::PlayerHasPerk(Forms::BakaAutoLock_Perks_WaxKey);
+		}
+
+		static void UnlockObject(RE::TESObjectREFR* a_terminal)
+		{
+			a_terminal->GetLock()->SetLocked(false);
+			a_terminal->AddLockChange();
+
+			if (auto TerminalHacked = RE::TerminalHacked::GetEventSource())
+			{
+				TerminalHacked->Notify(RE::TerminalHacked::Event{ a_terminal->GetHandle() });
+			}
+
+			if (auto BGSStoryEventManager = RE::BGSStoryEventManager::GetSingleton())
+			{
+				RE::BGSHackTerminal BGSHackTerminal{ a_terminal, 1 };
+				BGSStoryEventManager->AddEvent(BGSHackTerminal);
+			}
+
+			RE::UIUtils::PlayMenuSound("UITerminalPasswordGood");
+		}
+
+		static void UnlockObjectFail(RE::TESObjectREFR* a_terminal)
+		{
+			if (auto BGSStoryEventManager = RE::BGSStoryEventManager::GetSingleton())
+			{
+				RE::BGSHackTerminal BGSHackTerminal{ a_terminal, 0 };
+				BGSStoryEventManager->AddEvent(BGSHackTerminal);
+			}
+
+			RE::UIUtils::PlayMenuSound("UITerminalPasswordBad");
+		}
+
+	protected:
+		inline static REL::Relocation<decltype(hkActivate)> _Activate;
 	};
 
 	class BakaAutoLock
@@ -530,32 +681,6 @@ namespace Hooks
 					RollMod);
 				logger::info(FMT_STRING("{:s}"), results);
 				RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
-			}
-
-			if (MCM::Settings::Rolls::bCriticalFailure)
-			{
-				if (RollMin == RollVal)
-				{
-					a_this->currentProcess->KnockExplosion(a_this, a_this->data.location, 5.0f);
-					RE::SendHUDMessage::ShowHUDMessage(
-						MCM::Settings::Formatting::sCriticalFailure.data(),
-						nullptr,
-						false,
-						false);
-				}
-			}
-
-			if (MCM::Settings::Rolls::bCriticalSuccess)
-			{
-				if (RollMax == RollVal)
-				{
-					HandleExperience(RE::LOCK_LEVEL::kVeryHard);
-					RE::SendHUDMessage::ShowHUDMessage(
-						MCM::Settings::Formatting::sCriticalSuccess.data(),
-						nullptr,
-						false,
-						false);
-				}
 			}
 
 			RollVal += RollMod;
