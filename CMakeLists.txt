@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 set(NAME "BakaAutoLockpicking")
-set(VERSION 1.2.0)
+set(VERSION 2.0.0)
 
 # ---- Options ----
 
