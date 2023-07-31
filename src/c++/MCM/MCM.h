@@ -34,6 +34,7 @@ namespace MCM
 			inline static std::int32_t iPlayerDiceMin{ 1 };
 			inline static std::int32_t iPlayerDiceMax{ 20 };
 			inline static std::int32_t iBonusPerBonus{ 0 };
+			inline static std::int32_t iBonusPerLucky{ 5 };
 			inline static std::int32_t iBonusPerPerks{ 1 };
 			inline static std::int32_t iBonusPerSkill{ 2 };
 		};
@@ -66,6 +67,7 @@ namespace MCM
 			inline static std::int32_t iPlayerDiceMin{ 1 };
 			inline static std::int32_t iPlayerDiceMax{ 20 };
 			inline static std::int32_t iBonusPerBonus{ 0 };
+			inline static std::int32_t iBonusPerLucky{ 5 };
 			inline static std::int32_t iBonusPerPerks{ 1 };
 			inline static std::int32_t iBonusPerSkill{ 2 };
 		};
@@ -74,6 +76,7 @@ namespace MCM
 		{
 		public:
 			inline static std::string sBonus;
+			inline static std::string sLucky;
 			inline static std::string sPerks;
 			inline static std::string sSkill;
 			inline static std::string sTotal;
@@ -190,6 +193,7 @@ namespace MCM
 					};
 
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Bonus", Formatting::sBonus);
+					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Lucky", Formatting::sLucky);
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Perks", Formatting::sPerks);
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Skill", Formatting::sSkill);
 					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Total", Formatting::sTotal);

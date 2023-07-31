@@ -153,18 +153,22 @@ namespace Hooks
 			auto SkillVal = GetRollModifier_Skill();
 			auto SkillMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sSkill.data()), SkillVal);
 
+			auto LuckyVal = GetRollModifier_Lucky();
+			auto LuckyMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sLucky.data()), LuckyVal);
+
 			auto PerksVal = GetRollModifier_Perks();
 			auto PerksMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sPerks.data()), PerksVal);
 
 			auto BonusVal = GetRollModifier_Bonus();
 			auto BonusMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sBonus.data()), BonusVal);
 
-			auto TotalVal = SkillVal + PerksVal + BonusVal;
+			auto TotalVal = SkillVal + LuckyVal + PerksVal + BonusVal;
 			auto TotalMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sTotal.data()), TotalVal);
 
 			auto msg = fmt::format(
-				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
+				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
 				SkillMsg,
+				LuckyMsg,
 				PerksMsg,
 				BonusMsg,
 				TotalMsg);
@@ -343,8 +347,17 @@ namespace Hooks
 		{
 			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
 			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
+			return MCM::Settings::HackRolls::iBonusPerSkill > 0
+			           ? static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::HackRolls::iBonusPerSkill))
+			           : 0;
+		}
 
-			return static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::HackRolls::iBonusPerSkill));
+		static std::int32_t GetRollModifier_Lucky()
+		{
+			auto LuckyVal = RE::PlayerCharacter::GetSingleton()->GetActorValue(*(RE::ActorValue::GetSingleton()->luck));
+			return MCM::Settings::HackRolls::iBonusPerLucky > 0
+			           ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::HackRolls::iBonusPerLucky))
+			           : 0;
 		}
 
 		static std::int32_t GetRollModifier_Perks()
@@ -558,18 +571,22 @@ namespace Hooks
 			auto SkillVal = GetRollModifier_Skill();
 			auto SkillMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sSkill.data()), SkillVal);
 
+			auto LuckyVal = GetRollModifier_Lucky();
+			auto LuckyMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sLucky.data()), LuckyVal);
+
 			auto PerksVal = GetRollModifier_Perks();
 			auto PerksMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sPerks.data()), PerksVal);
 
 			auto BonusVal = GetRollModifier_Bonus();
 			auto BonusMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sBonus.data()), BonusVal);
 
-			auto TotalVal = SkillVal + PerksVal + BonusVal;
+			auto TotalVal = SkillVal + LuckyVal + PerksVal + BonusVal;
 			auto TotalMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sTotal.data()), TotalVal);
 
 			auto msg = fmt::format(
-				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
+				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
 				SkillMsg,
+				LuckyMsg,
 				PerksMsg,
 				BonusMsg,
 				TotalMsg);
@@ -781,8 +798,17 @@ namespace Hooks
 			auto SkillMod = PlayerCharacter->GetActorValue(*Forms::LGND_LockPickSweetSpot);
 			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
 			auto SkillVal = SkillLvl * (1.0f + ((SkillMod) / 10.0f));
+			return MCM::Settings::LockRolls::iBonusPerSkill > 0
+			           ? static_cast<std::int32_t>(floorf(SkillVal / MCM::Settings::LockRolls::iBonusPerSkill))
+			           : 0;
+		}
 
-			return static_cast<std::int32_t>(floorf(SkillVal / MCM::Settings::LockRolls::iBonusPerSkill));
+		static std::int32_t GetRollModifier_Lucky()
+		{
+			auto LuckyVal = RE::PlayerCharacter::GetSingleton()->GetActorValue(*(RE::ActorValue::GetSingleton()->luck));
+			return MCM::Settings::LockRolls::iBonusPerLucky > 0
+			           ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::LockRolls::iBonusPerLucky))
+			           : 0;
 		}
 
 		static std::int32_t GetRollModifier_Perks()
