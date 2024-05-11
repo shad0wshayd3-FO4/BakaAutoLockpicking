@@ -224,23 +224,23 @@ namespace Hooks
 				auto LockLvl = a_this->GetHackDifficultyLockLevel(a_itemActivated);
 				switch (LockLvl)
 				{
-					case RE::LOCK_LEVEL::kEasy:
-					case RE::LOCK_LEVEL::kAverage:
-					case RE::LOCK_LEVEL::kHard:
-					case RE::LOCK_LEVEL::kVeryHard:
+				case RE::LOCK_LEVEL::kEasy:
+				case RE::LOCK_LEVEL::kAverage:
+				case RE::LOCK_LEVEL::kHard:
+				case RE::LOCK_LEVEL::kVeryHard:
+				{
+					if (!MCM::Settings::HackGeneral::bIgnoreHasPass)
+					{
+						if (LockKey && BakaAutoShared::PlayerHasItem(LockKey))
 						{
-							if (!MCM::Settings::HackGeneral::bIgnoreHasPass)
-							{
-								if (LockKey && BakaAutoShared::PlayerHasItem(LockKey))
-								{
-									return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
-								}
-							}
-							break;
+							return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 						}
+					}
+					break;
+				}
 
-					default:
-						return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
+				default:
+					return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 				}
 
 				if (!MCM::Settings::HackGeneral::bNoTimeouts)
@@ -329,14 +329,14 @@ namespace Hooks
 		{
 			switch (a_lockLevel)
 			{
-				case RE::LOCK_LEVEL::kAverage:
-					return MCM::Settings::HackRolls::iDCAdvanced;
-				case RE::LOCK_LEVEL::kHard:
-					return MCM::Settings::HackRolls::iDCExpert;
-				case RE::LOCK_LEVEL::kVeryHard:
-					return MCM::Settings::HackRolls::iDCMaster;
-				default:
-					return MCM::Settings::HackRolls::iDCNovice;
+			case RE::LOCK_LEVEL::kAverage:
+				return MCM::Settings::HackRolls::iDCAdvanced;
+			case RE::LOCK_LEVEL::kHard:
+				return MCM::Settings::HackRolls::iDCExpert;
+			case RE::LOCK_LEVEL::kVeryHard:
+				return MCM::Settings::HackRolls::iDCMaster;
+			default:
+				return MCM::Settings::HackRolls::iDCNovice;
 			}
 		}
 
@@ -345,16 +345,16 @@ namespace Hooks
 			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
 			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
 			return MCM::Settings::HackRolls::iBonusPerSkill > 0
-			           ? static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::HackRolls::iBonusPerSkill))
-			           : 0;
+			         ? static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::HackRolls::iBonusPerSkill))
+			         : 0;
 		}
 
 		static std::int32_t GetRollModifier_Lucky()
 		{
 			auto LuckyVal = RE::PlayerCharacter::GetSingleton()->GetActorValue(*(RE::ActorValue::GetSingleton()->luck));
 			return MCM::Settings::HackRolls::iBonusPerLucky > 0
-			           ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::HackRolls::iBonusPerLucky))
-			           : 0;
+			         ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::HackRolls::iBonusPerLucky))
+			         : 0;
 		}
 
 		static std::int32_t GetRollModifier_Perks()
@@ -390,22 +390,22 @@ namespace Hooks
 			auto ActorValue = RE::ActorValue::GetSingleton();
 			switch (MCM::Settings::HackGeneral::iSkillIndex)
 			{
-				case 0:
-					return ActorValue->strength;
-				case 1:
-					return ActorValue->perception;
-				case 2:
-					return ActorValue->endurance;
-				case 3:
-					return ActorValue->charisma;
-				case 4:
-					return ActorValue->intelligence;
-				case 5:
-					return ActorValue->agility;
-				case 6:
-					return ActorValue->luck;
-				default:
-					return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::HackGeneral::sSkillName);
+			case 0:
+				return ActorValue->strength;
+			case 1:
+				return ActorValue->perception;
+			case 2:
+				return ActorValue->endurance;
+			case 3:
+				return ActorValue->charisma;
+			case 4:
+				return ActorValue->intelligence;
+			case 5:
+				return ActorValue->agility;
+			case 6:
+				return ActorValue->luck;
+			default:
+				return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::HackGeneral::sSkillName);
 			}
 		}
 
@@ -443,17 +443,17 @@ namespace Hooks
 			RE::DIFFICULTY_LEVEL Difficulty{ RE::DIFFICULTY_LEVEL::kEasy };
 			switch (a_lockLevel)
 			{
-				case RE::LOCK_LEVEL::kAverage:
-					Difficulty = RE::DIFFICULTY_LEVEL::kNormal;
-					break;
-				case RE::LOCK_LEVEL::kHard:
-					Difficulty = RE::DIFFICULTY_LEVEL::kHard;
-					break;
-				case RE::LOCK_LEVEL::kVeryHard:
-					Difficulty = RE::DIFFICULTY_LEVEL::kVeryHard;
-					break;
-				default:
-					break;
+			case RE::LOCK_LEVEL::kAverage:
+				Difficulty = RE::DIFFICULTY_LEVEL::kNormal;
+				break;
+			case RE::LOCK_LEVEL::kHard:
+				Difficulty = RE::DIFFICULTY_LEVEL::kHard;
+				break;
+			case RE::LOCK_LEVEL::kVeryHard:
+				Difficulty = RE::DIFFICULTY_LEVEL::kVeryHard;
+				break;
+			default:
+				break;
 			}
 
 			auto reward =
@@ -621,7 +621,7 @@ namespace Hooks
 		}
 
 	private:
-		template<std::uint64_t ID, std::ptrdiff_t OFFSET>
+		template <std::uint64_t ID, std::ptrdiff_t OFFSET>
 		class hkHasObjects
 		{
 		public:
@@ -671,45 +671,45 @@ namespace Hooks
 			auto LockLvl = Lock->GetLockLevel(nullptr);
 			switch (LockLvl)
 			{
-				case RE::LOCK_LEVEL::kEasy:
-				case RE::LOCK_LEVEL::kAverage:
-				case RE::LOCK_LEVEL::kHard:
-				case RE::LOCK_LEVEL::kVeryHard:
-					break;
+			case RE::LOCK_LEVEL::kEasy:
+			case RE::LOCK_LEVEL::kAverage:
+			case RE::LOCK_LEVEL::kHard:
+			case RE::LOCK_LEVEL::kVeryHard:
+				break;
 
-				case RE::LOCK_LEVEL::kRequiresKey:
-					{
-						if (BakaAutoShared::PlayerHasItem(LockKey))
-						{
-							UnlockObject(a_refr, false);
-							BakaAutoShared::ShowMessage("sOpenWithKey", LockKey->GetFullName());
-							return false;
-						}
-
-						auto SettingName =
-							LockKey
-								? "sAutoLockPickKeyOnly"
-								: "sAutoLockPickNoKey";
-						BakaAutoShared::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
-						return false;
-					}
-
-				case RE::LOCK_LEVEL::kTerminal:
-					{
-						BakaAutoShared::ShowMessage("sAutoLockPickTerminal");
-						return false;
-					}
-
-				case RE::LOCK_LEVEL::kInaccessible:
-				case RE::LOCK_LEVEL::kBarred:
-				case RE::LOCK_LEVEL::kChained:
-					{
-						BakaAutoShared::ShowMessage("sAutoLockPickInaccessible");
-						return false;
-					}
-
-				default:
+			case RE::LOCK_LEVEL::kRequiresKey:
+			{
+				if (BakaAutoShared::PlayerHasItem(LockKey))
+				{
+					UnlockObject(a_refr, false);
+					BakaAutoShared::ShowMessage("sOpenWithKey", LockKey->GetFullName());
 					return false;
+				}
+
+				auto SettingName =
+					LockKey
+						? "sAutoLockPickKeyOnly"
+						: "sAutoLockPickNoKey";
+				BakaAutoShared::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
+				return false;
+			}
+
+			case RE::LOCK_LEVEL::kTerminal:
+			{
+				BakaAutoShared::ShowMessage("sAutoLockPickTerminal");
+				return false;
+			}
+
+			case RE::LOCK_LEVEL::kInaccessible:
+			case RE::LOCK_LEVEL::kBarred:
+			case RE::LOCK_LEVEL::kChained:
+			{
+				BakaAutoShared::ShowMessage("sAutoLockPickInaccessible");
+				return false;
+			}
+
+			default:
+				return false;
 			}
 
 			if (!PlayerHasLockpicks())
@@ -799,14 +799,14 @@ namespace Hooks
 		{
 			switch (a_lockLevel)
 			{
-				case RE::LOCK_LEVEL::kAverage:
-					return MCM::Settings::LockRolls::iDCAdvanced;
-				case RE::LOCK_LEVEL::kHard:
-					return MCM::Settings::LockRolls::iDCExpert;
-				case RE::LOCK_LEVEL::kVeryHard:
-					return MCM::Settings::LockRolls::iDCMaster;
-				default:
-					return MCM::Settings::LockRolls::iDCNovice;
+			case RE::LOCK_LEVEL::kAverage:
+				return MCM::Settings::LockRolls::iDCAdvanced;
+			case RE::LOCK_LEVEL::kHard:
+				return MCM::Settings::LockRolls::iDCExpert;
+			case RE::LOCK_LEVEL::kVeryHard:
+				return MCM::Settings::LockRolls::iDCMaster;
+			default:
+				return MCM::Settings::LockRolls::iDCNovice;
 			}
 		}
 
@@ -817,16 +817,16 @@ namespace Hooks
 			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
 			auto SkillVal = SkillLvl * (1.0f + ((SkillMod) / 10.0f));
 			return MCM::Settings::LockRolls::iBonusPerSkill > 0
-			           ? static_cast<std::int32_t>(floorf(SkillVal / MCM::Settings::LockRolls::iBonusPerSkill))
-			           : 0;
+			         ? static_cast<std::int32_t>(floorf(SkillVal / MCM::Settings::LockRolls::iBonusPerSkill))
+			         : 0;
 		}
 
 		static std::int32_t GetRollModifier_Lucky()
 		{
 			auto LuckyVal = RE::PlayerCharacter::GetSingleton()->GetActorValue(*(RE::ActorValue::GetSingleton()->luck));
 			return MCM::Settings::LockRolls::iBonusPerLucky > 0
-			           ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::LockRolls::iBonusPerLucky))
-			           : 0;
+			         ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::LockRolls::iBonusPerLucky))
+			         : 0;
 		}
 
 		static std::int32_t GetRollModifier_Perks()
@@ -862,22 +862,22 @@ namespace Hooks
 			auto ActorValue = RE::ActorValue::GetSingleton();
 			switch (MCM::Settings::LockGeneral::iSkillIndex)
 			{
-				case 0:
-					return ActorValue->strength;
-				case 1:
-					return ActorValue->perception;
-				case 2:
-					return ActorValue->endurance;
-				case 3:
-					return ActorValue->charisma;
-				case 4:
-					return ActorValue->intelligence;
-				case 5:
-					return ActorValue->agility;
-				case 6:
-					return ActorValue->luck;
-				default:
-					return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::LockGeneral::sSkillName);
+			case 0:
+				return ActorValue->strength;
+			case 1:
+				return ActorValue->perception;
+			case 2:
+				return ActorValue->endurance;
+			case 3:
+				return ActorValue->charisma;
+			case 4:
+				return ActorValue->intelligence;
+			case 5:
+				return ActorValue->agility;
+			case 6:
+				return ActorValue->luck;
+			default:
+				return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::LockGeneral::sSkillName);
 			}
 		}
 
@@ -1038,8 +1038,7 @@ namespace Hooks
 			}
 
 			RE::UIUtils::PlayMenuSound("UILockpickingUnlock");
-			if ((MCM::Settings::LockGeneral::bActivateContAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kCONT))
-			    || (MCM::Settings::LockGeneral::bActivateDoorAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kDOOR)))
+			if ((MCM::Settings::LockGeneral::bActivateContAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kCONT)) || (MCM::Settings::LockGeneral::bActivateDoorAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kDOOR)))
 			{
 				a_refr->ActivateRef(RE::PlayerCharacter::GetSingleton(), nullptr, 1, false, false, false);
 			}
