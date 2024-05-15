@@ -3,7 +3,6 @@
     "name": "bakaautolockpicking",
     "homepage": "https://github.com/shad0wshayd3-FO4/BakaAutoLockpicking",
     "dependencies": [
-        "boost-stl-interfaces",
         "nlohmann-json",
         "rsm-mmio",
         "simpleini",
