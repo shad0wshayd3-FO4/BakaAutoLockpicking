@@ -3,48 +3,43 @@
 #include "Hooks/Hooks.h"
 #include "MCM/MCM.h"
 
-namespace Papyrus
+namespace Papyrus::BakaAutoLock
 {
-	class BakaAutoLock
+	static constexpr auto CLASS_NAME{ "BakaAutoLock"sv };
+
+	enum
 	{
-	public:
-		static bool Register(RE::BSScript::IVirtualMachine* a_vm)
-		{
-			a_vm->BindNativeMethod(CLASS_NAME, "GetVersion", GetVersion, true);
-			a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiers", ShowRollModifiers);
-			a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiersHack", ShowRollModifiersHack);
-			a_vm->BindNativeMethod(CLASS_NAME, "UpdateSettings", UpdateSettings);
-			logger::info(FMT_STRING("Registered funcs for class {:s}"sv), CLASS_NAME);
-
-			return true;
-		}
-
-	private:
-		static constexpr char CLASS_NAME[] = "BakaAutoLock";
-
-		enum
-		{
-			kVersion = 1
-		};
-
-		static std::int32_t GetVersion(std::monostate)
-		{
-			return kVersion;
-		}
-
-		static void ShowRollModifiers(std::monostate)
-		{
-			Hooks::BakaAutoLock::ShowRollModifiers();
-		}
-
-		static void ShowRollModifiersHack(std::monostate)
-		{
-			Hooks::BakaAutoHack::ShowRollModifiers();
-		}
-
-		static void UpdateSettings(std::monostate)
-		{
-			MCM::Settings::Update();
-		}
+		kVersion = 1
 	};
+
+	static std::int32_t GetVersion(std::monostate)
+	{
+		return kVersion;
+	}
+
+	static void ShowRollModifiers(std::monostate)
+	{
+		Hooks::BakaAutoLock::ShowRollModifiers();
+	}
+
+	static void ShowRollModifiersHack(std::monostate)
+	{
+		Hooks::BakaAutoHack::ShowRollModifiers();
+	}
+
+	static void UpdateSettings(std::monostate)
+	{
+		MCM::Settings::Load(false);
+	}
+
+	static bool Register(RE::BSScript::IVirtualMachine* a_vm)
+	{
+		a_vm->BindNativeMethod(CLASS_NAME, "GetVersion", GetVersion, true);
+		a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiers", ShowRollModifiers);
+		a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiersHack", ShowRollModifiersHack);
+		a_vm->BindNativeMethod(CLASS_NAME, "UpdateSettings", UpdateSettings);
+		F4SE::log::info("Registered funcs for class {}"sv, CLASS_NAME);
+
+		return true;
+	}
 }

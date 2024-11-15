@@ -7,8 +7,6 @@ namespace Hooks
 	class BakaAutoShared
 	{
 	public:
-		using Random = effolkronium::random_thread_local;
-
 		static bool PlayerHasItem(RE::TESForm* a_form)
 		{
 			if (!a_form)
@@ -125,7 +123,7 @@ namespace Hooks
 					{
 						if (!a_formatText.empty())
 						{
-							auto formatted = fmt::sprintf(message.data(), a_formatText);
+							auto formatted = std::vformat(message, std::make_format_args(a_formatText));
 							RE::SendHUDMessage::ShowHUDMessage(formatted.data(), a_sound, true, true);
 							return;
 						}
@@ -142,45 +140,33 @@ namespace Hooks
 	public:
 		static void Install()
 		{
-			REL::Relocation<std::uintptr_t> target{ RE::BGSTerminal::VTABLE[0] };
+			REL::Relocation target{ RE::BGSTerminal::VTABLE[0] };
 			_Activate = target.write_vfunc(0x40, reinterpret_cast<std::uintptr_t>(hkActivate));
 		}
 
 		static void ShowRollModifiers()
 		{
-			MCM::Settings::Update();
+			MCM::Settings::Load(false);
 
 			auto SkillVal = GetRollModifier_Skill();
-			auto SkillMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sSkill.data()), SkillVal);
+			auto SkillMsg = std::vformat(MCM::Settings::Formatting::sSkill, std::make_format_args(SkillVal));
 
 			auto LuckyVal = GetRollModifier_Lucky();
-			auto LuckyMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sLucky.data()), LuckyVal);
+			auto LuckyMsg = std::vformat(MCM::Settings::Formatting::sLucky, std::make_format_args(LuckyVal));
 
 			auto PerksVal = GetRollModifier_Perks();
-			auto PerksMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sPerks.data()), PerksVal);
+			auto PerksMsg = std::vformat(MCM::Settings::Formatting::sPerks, std::make_format_args(PerksVal));
 
 			auto BonusVal = GetRollModifier_Bonus();
-			auto BonusMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sBonus.data()), BonusVal);
+			auto BonusMsg = std::vformat(MCM::Settings::Formatting::sBonus, std::make_format_args(BonusVal));
 
 			auto TotalVal = SkillVal + LuckyVal + PerksVal + BonusVal;
-			auto TotalMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sTotal.data()), TotalVal);
+			auto TotalMsg = std::vformat(MCM::Settings::Formatting::sTotal, std::make_format_args(TotalVal));
 
-			auto msg = fmt::format(
-				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
-				SkillMsg,
-				LuckyMsg,
-				PerksMsg,
-				BonusMsg,
-				TotalMsg);
-
+			auto msg = std::vformat("<font face='$DebugTextFont'>{}\n{}\n{}\n{}\n{}</font>"sv, std::make_format_args(SkillMsg, LuckyMsg, PerksMsg, BonusMsg, TotalMsg));
 			if (auto MessageMenuManager = RE::MessageMenuManager::GetSingleton())
 			{
-				MessageMenuManager->Create(
-					"",
-					msg.data(),
-					nullptr,
-					RE::WARNING_TYPES::kDefault,
-					"$OK");
+				MessageMenuManager->Create("", msg.data(), nullptr, RE::WARNING_TYPES::kDefault, "$OK");
 			}
 		}
 
@@ -193,12 +179,7 @@ namespace Hooks
 				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 			}
 
-			if (MCM::Settings::m_FirstRun)
-			{
-				MCM::Settings::Update();
-			}
-
-			if (!MCM::Settings::HackGeneral::bModEnabled)
+			if (!MCM::Settings::HackGeneral::bModEnabled.GetValue())
 			{
 				return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 			}
@@ -229,7 +210,7 @@ namespace Hooks
 				case RE::LOCK_LEVEL::kHard:
 				case RE::LOCK_LEVEL::kVeryHard:
 				{
-					if (!MCM::Settings::HackGeneral::bIgnoreHasPass)
+					if (!MCM::Settings::HackGeneral::bIgnoreHasPass.GetValue())
 					{
 						if (LockKey && BakaAutoShared::PlayerHasItem(LockKey))
 						{
@@ -243,7 +224,7 @@ namespace Hooks
 					return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 				}
 
-				if (!MCM::Settings::HackGeneral::bNoTimeouts)
+				if (!MCM::Settings::HackGeneral::bNoTimeouts.GetValue())
 				{
 					if (PlayerCharacter->IsLockedOutOfTerminal(a_itemActivated->GetHandle()))
 					{
@@ -252,7 +233,7 @@ namespace Hooks
 					}
 				}
 
-				if (!MCM::Settings::HackGeneral::bIgnoreHackGates)
+				if (!MCM::Settings::HackGeneral::bIgnoreHackGates.GetValue())
 				{
 					if (!RE::GamePlayFormulas::CanHackGateCheck(LockLvl))
 					{
@@ -262,19 +243,15 @@ namespace Hooks
 				}
 
 				auto LockVal = GetLockDifficultyClass(LockLvl);
-				auto RollMin = MCM::Settings::HackRolls::iPlayerDiceMin;
-				auto RollMax = std::max(RollMin, MCM::Settings::HackRolls::iPlayerDiceMax);
+				auto RollMin = MCM::Settings::HackRolls::iPlayerDiceMin.GetValue();
+				auto RollMax = std::max(RollMin, MCM::Settings::HackRolls::iPlayerDiceMax.GetValue());
 				auto RollMod = GetRollModifier();
-				auto RollVal = BakaAutoShared::Random::get<std::int32_t>(RollMin, RollMax);
+				auto RollVal = effolkronium::random_thread_local::get<std::int32_t>(RollMin, RollMax);
 
-				if (MCM::Settings::HackGeneral::bShowRollResults)
+				if (MCM::Settings::HackGeneral::bShowRollResults.GetValue())
 				{
-					auto results = fmt::format(
-						fmt::runtime(MCM::Settings::Formatting::sShowRollResults.data()),
-						LockVal,
-						RollVal,
-						RollMod);
-					logger::info(FMT_STRING("{:s}"), results);
+					auto results = std::vformat(MCM::Settings::Formatting::sShowRollResults, std::make_format_args(LockVal, RollVal, RollMod));
+					F4SE::log::info("{}"sv, results);
 					RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
 				}
 
@@ -285,16 +262,12 @@ namespace Hooks
 					HandleExperience(LockLvl);
 					HandleWaxKey(LockKey);
 
-					if (MCM::Settings::HackGeneral::iDetectionEventSuccessLevel)
+					if (MCM::Settings::HackGeneral::iDetectionEventSuccessLevel.GetValue())
 					{
-						PlayerCharacter->currentProcess->SetActorsDetectionEvent(
-							PlayerCharacter,
-							a_itemActivated->data.location,
-							MCM::Settings::HackGeneral::iDetectionEventSuccessLevel,
-							a_itemActivated);
+						PlayerCharacter->currentProcess->SetActorsDetectionEvent(PlayerCharacter, a_itemActivated->data.location, MCM::Settings::HackGeneral::iDetectionEventSuccessLevel.GetValue(), a_itemActivated);
 					}
 
-					if (MCM::Settings::HackGeneral::bActivateTermAfterHack)
+					if (MCM::Settings::HackGeneral::bActivateTermAfterHack.GetValue())
 					{
 						return _Activate(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 					}
@@ -308,13 +281,9 @@ namespace Hooks
 				{
 					UnlockObjectFail(a_itemActivated);
 
-					if (MCM::Settings::HackGeneral::iDetectionEventFailureLevel)
+					if (MCM::Settings::HackGeneral::iDetectionEventFailureLevel.GetValue())
 					{
-						PlayerCharacter->currentProcess->SetActorsDetectionEvent(
-							PlayerCharacter,
-							a_itemActivated->data.location,
-							MCM::Settings::HackGeneral::iDetectionEventFailureLevel,
-							a_itemActivated);
+						PlayerCharacter->currentProcess->SetActorsDetectionEvent(PlayerCharacter, a_itemActivated->data.location, MCM::Settings::HackGeneral::iDetectionEventFailureLevel.GetValue(), a_itemActivated);
 					}
 
 					HandlePostActivate(a_itemActivated);
@@ -330,13 +299,13 @@ namespace Hooks
 			switch (a_lockLevel)
 			{
 			case RE::LOCK_LEVEL::kAverage:
-				return MCM::Settings::HackRolls::iDCAdvanced;
+				return MCM::Settings::HackRolls::iDCAdvanced.GetValue();
 			case RE::LOCK_LEVEL::kHard:
-				return MCM::Settings::HackRolls::iDCExpert;
+				return MCM::Settings::HackRolls::iDCExpert.GetValue();
 			case RE::LOCK_LEVEL::kVeryHard:
-				return MCM::Settings::HackRolls::iDCMaster;
+				return MCM::Settings::HackRolls::iDCMaster.GetValue();
 			default:
-				return MCM::Settings::HackRolls::iDCNovice;
+				return MCM::Settings::HackRolls::iDCNovice.GetValue();
 			}
 		}
 
@@ -344,17 +313,13 @@ namespace Hooks
 		{
 			auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
 			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
-			return MCM::Settings::HackRolls::iBonusPerSkill > 0
-			         ? static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::HackRolls::iBonusPerSkill))
-			         : 0;
+			return (MCM::Settings::HackRolls::iBonusPerSkill.GetValue() > 0) ? static_cast<std::int32_t>(floorf(SkillLvl / MCM::Settings::HackRolls::iBonusPerSkill.GetValue())) : 0;
 		}
 
 		static std::int32_t GetRollModifier_Lucky()
 		{
 			auto LuckyVal = RE::PlayerCharacter::GetSingleton()->GetActorValue(*(RE::ActorValue::GetSingleton()->luck));
-			return MCM::Settings::HackRolls::iBonusPerLucky > 0
-			         ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::HackRolls::iBonusPerLucky))
-			         : 0;
+			return (MCM::Settings::HackRolls::iBonusPerLucky.GetValue() > 0) ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::HackRolls::iBonusPerLucky.GetValue())) : 0;
 		}
 
 		static std::int32_t GetRollModifier_Perks()
@@ -364,7 +329,7 @@ namespace Hooks
 			{
 				if (BakaAutoShared::PlayerHasPerk(form))
 				{
-					result += MCM::Settings::HackRolls::iBonusPerPerks;
+					result += MCM::Settings::HackRolls::iBonusPerPerks.GetValue();
 				}
 			}
 
@@ -373,7 +338,7 @@ namespace Hooks
 
 		static std::int32_t GetRollModifier_Bonus()
 		{
-			return MCM::Settings::HackRolls::iBonusPerBonus;
+			return MCM::Settings::HackRolls::iBonusPerBonus.GetValue();
 		}
 
 		static std::int32_t GetRollModifier()
@@ -388,7 +353,7 @@ namespace Hooks
 		static RE::ActorValueInfo* GetSkillFromIndex()
 		{
 			auto ActorValue = RE::ActorValue::GetSingleton();
-			switch (MCM::Settings::HackGeneral::iSkillIndex)
+			switch (MCM::Settings::HackGeneral::iSkillIndex.GetValue())
 			{
 			case 0:
 				return ActorValue->strength;
@@ -405,7 +370,7 @@ namespace Hooks
 			case 6:
 				return ActorValue->luck;
 			default:
-				return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::HackGeneral::sSkillName);
+				return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::HackGeneral::sSkillName.GetValue());
 			}
 		}
 
@@ -478,7 +443,7 @@ namespace Hooks
 				false,
 				false);
 
-			if (MCM::Settings::HackGeneral::bHackingCrimeCheck)
+			if (MCM::Settings::HackGeneral::bHackingCrimeCheck.GetValue())
 			{
 				HandleCrime(a_terminal);
 			}
@@ -491,19 +456,14 @@ namespace Hooks
 				if (!BakaAutoShared::PlayerHasItem(a_key))
 				{
 					auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
-					PlayerCharacter->AddObjectToContainer(
-						a_key,
-						nullptr,
-						1,
-						nullptr,
-						RE::ITEM_REMOVE_REASON::kNone);
+					PlayerCharacter->AddObjectToContainer(a_key, nullptr, 1, nullptr, RE::ITEM_REMOVE_REASON::kNone);
 				}
 			}
 		}
 
 		static bool PlayerHasWaxKey()
 		{
-			if (MCM::Settings::HackGeneral::bGivePass)
+			if (MCM::Settings::HackGeneral::bGivePass.GetValue())
 			{
 				return true;
 			}
@@ -516,10 +476,10 @@ namespace Hooks
 			a_terminal->GetLock()->SetLocked(false);
 			a_terminal->AddLockChange();
 
-			if (auto TerminalHacked = RE::TerminalHacked::GetEventSource())
-			{
-				TerminalHacked->Notify(RE::TerminalHacked::Event{ a_terminal->GetHandle() });
-			}
+			// if (auto TerminalHacked = RE::TerminalHacked::GetEventSource())
+			// {
+			// 	TerminalHacked->Notify(RE::TerminalHacked::Event{ a_terminal->GetHandle() });
+			// }
 
 			if (auto BGSStoryEventManager = RE::BGSStoryEventManager::GetSingleton())
 			{
@@ -532,13 +492,10 @@ namespace Hooks
 
 		static void UnlockObjectFail(RE::TESObjectREFR* a_terminal)
 		{
-			if (!MCM::Settings::HackGeneral::bNoTimeouts)
+			if (!MCM::Settings::HackGeneral::bNoTimeouts.GetValue())
 			{
 				float HackingGuesses = 4.0f;
-				RE::BGSEntryPoint::HandleEntryPoint(
-					RE::BGSEntryPoint::ENTRY_POINT::kModHackingGuesses,
-					RE::PlayerCharacter::GetSingleton(),
-					&HackingGuesses);
+				RE::BGSEntryPoint::HandleEntryPoint(RE::BGSEntryPoint::ENTRY_POINT::kModHackingGuesses, RE::PlayerCharacter::GetSingleton(), &HackingGuesses);
 
 				float HackingAttempt = a_terminal->GetActorValue(*Forms::BakaAutoHack_Attempts);
 				if (++HackingAttempt >= HackingGuesses)
@@ -584,39 +541,27 @@ namespace Hooks
 
 		static void ShowRollModifiers()
 		{
-			MCM::Settings::Update();
+			MCM::Settings::Load(false);
 
 			auto SkillVal = GetRollModifier_Skill();
-			auto SkillMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sSkill.data()), SkillVal);
+			auto SkillMsg = std::vformat(MCM::Settings::Formatting::sSkill, std::make_format_args(SkillVal));
 
 			auto LuckyVal = GetRollModifier_Lucky();
-			auto LuckyMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sLucky.data()), LuckyVal);
+			auto LuckyMsg = std::vformat(MCM::Settings::Formatting::sLucky, std::make_format_args(LuckyVal));
 
 			auto PerksVal = GetRollModifier_Perks();
-			auto PerksMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sPerks.data()), PerksVal);
+			auto PerksMsg = std::vformat(MCM::Settings::Formatting::sPerks, std::make_format_args(PerksVal));
 
 			auto BonusVal = GetRollModifier_Bonus();
-			auto BonusMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sBonus.data()), BonusVal);
+			auto BonusMsg = std::vformat(MCM::Settings::Formatting::sBonus, std::make_format_args(BonusVal));
 
 			auto TotalVal = SkillVal + LuckyVal + PerksVal + BonusVal;
-			auto TotalMsg = fmt::format(fmt::runtime(MCM::Settings::Formatting::sTotal.data()), TotalVal);
+			auto TotalMsg = std::vformat(MCM::Settings::Formatting::sTotal, std::make_format_args(TotalVal));
 
-			auto msg = fmt::format(
-				FMT_STRING("<font face='$DebugTextFont'>{:s}\n{:s}\n{:s}\n{:s}\n{:s}</font>"sv),
-				SkillMsg,
-				LuckyMsg,
-				PerksMsg,
-				BonusMsg,
-				TotalMsg);
-
+			auto msg = std::vformat("<font face='$DebugTextFont'>{}\n{}\n{}\n{}\n{}</font>"sv, std::make_format_args(SkillMsg, LuckyMsg, PerksMsg, BonusMsg, TotalMsg));
 			if (auto MessageMenuManager = RE::MessageMenuManager::GetSingleton())
 			{
-				MessageMenuManager->Create(
-					"",
-					msg.data(),
-					nullptr,
-					RE::WARNING_TYPES::kDefault,
-					"$OK");
+				MessageMenuManager->Create("", msg.data(), nullptr, RE::WARNING_TYPES::kDefault, "$OK");
 			}
 		}
 
@@ -635,7 +580,7 @@ namespace Hooks
 		private:
 			static bool HasObjects(RE::Actor* a_this, void* a_arg2, std::int32_t a_arg3, std::int32_t a_arg4, std::uint32_t a_arg5, std::int32_t& a_arg6)
 			{
-				if (MCM::Settings::LockGeneral::bIgnoreHasKey)
+				if (MCM::Settings::LockGeneral::bIgnoreHasKey.GetValue())
 				{
 					if (a_this == RE::PlayerCharacter::GetSingleton())
 					{
@@ -651,11 +596,6 @@ namespace Hooks
 
 		static bool TryUnlockObjectImpl(RE::PlayerCharacter* a_this, RE::TESObjectREFR* a_refr, bool)
 		{
-			if (MCM::Settings::m_FirstRun)
-			{
-				MCM::Settings::Update();
-			}
-
 			if (!a_refr)
 			{
 				return false;
@@ -686,10 +626,7 @@ namespace Hooks
 					return false;
 				}
 
-				auto SettingName =
-					LockKey
-						? "sAutoLockPickKeyOnly"
-						: "sAutoLockPickNoKey";
+				auto SettingName = LockKey ? "sAutoLockPickKeyOnly" : "sAutoLockPickNoKey";
 				BakaAutoShared::ShowMessage(SettingName, LockKey ? LockKey->GetFullName() : "");
 				return false;
 			}
@@ -725,7 +662,7 @@ namespace Hooks
 				return false;
 			}
 
-			if (!MCM::Settings::LockGeneral::bIgnoreLockGates)
+			if (!MCM::Settings::LockGeneral::bIgnoreLockGates.GetValue())
 			{
 				if (!RE::GamePlayFormulas::CanPickLockGateCheck(LockLvl))
 				{
@@ -734,26 +671,22 @@ namespace Hooks
 				}
 			}
 
-			if (!MCM::Settings::LockGeneral::bModEnabled)
+			if (!MCM::Settings::LockGeneral::bModEnabled.GetValue())
 			{
 				RE::LockpickingMenu::OpenLockpickingMenu(a_refr);
 				return false;
 			}
 
 			auto LockVal = GetLockDifficultyClass(LockLvl);
-			auto RollMin = MCM::Settings::LockRolls::iPlayerDiceMin;
-			auto RollMax = std::max(RollMin, MCM::Settings::LockRolls::iPlayerDiceMax);
+			auto RollMin = MCM::Settings::LockRolls::iPlayerDiceMin.GetValue();
+			auto RollMax = std::max(RollMin, MCM::Settings::LockRolls::iPlayerDiceMax.GetValue());
 			auto RollMod = GetRollModifier();
-			auto RollVal = BakaAutoShared::Random::get<std::int32_t>(RollMin, RollMax);
+			auto RollVal = effolkronium::random_thread_local::get<std::int32_t>(RollMin, RollMax);
 
-			if (MCM::Settings::LockGeneral::bShowRollResults)
+			if (MCM::Settings::LockGeneral::bShowRollResults.GetValue())
 			{
-				auto results = fmt::format(
-					fmt::runtime(MCM::Settings::Formatting::sShowRollResults.data()),
-					LockVal,
-					RollVal,
-					RollMod);
-				logger::info(FMT_STRING("{:s}"), results);
+				auto results = std::vformat(MCM::Settings::Formatting::sShowRollResults, std::make_format_args(LockVal, RollVal, RollMod));
+				F4SE::log::info("{}"sv, results);
 				RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
 			}
 
@@ -764,30 +697,22 @@ namespace Hooks
 				HandleExperience(LockLvl);
 				HandleWaxKey(LockKey);
 
-				if (MCM::Settings::LockGeneral::iDetectionEventSuccessLevel)
+				if (MCM::Settings::LockGeneral::iDetectionEventSuccessLevel.GetValue())
 				{
-					a_this->currentProcess->SetActorsDetectionEvent(
-						a_this,
-						a_refr->data.location,
-						MCM::Settings::LockGeneral::iDetectionEventSuccessLevel,
-						a_refr);
+					a_this->currentProcess->SetActorsDetectionEvent(a_this, a_refr->data.location, MCM::Settings::LockGeneral::iDetectionEventSuccessLevel.GetValue(), a_refr);
 				}
 			}
 			else
 			{
 				HandleLockpickRemoval();
 
-				if (MCM::Settings::LockGeneral::iDetectionEventFailureLevel)
+				if (MCM::Settings::LockGeneral::iDetectionEventFailureLevel.GetValue())
 				{
-					a_this->currentProcess->SetActorsDetectionEvent(
-						a_this,
-						a_refr->data.location,
-						MCM::Settings::LockGeneral::iDetectionEventFailureLevel,
-						a_refr);
+					a_this->currentProcess->SetActorsDetectionEvent(a_this, a_refr->data.location, MCM::Settings::LockGeneral::iDetectionEventFailureLevel.GetValue(), a_refr);
 				}
 			}
 
-			if (MCM::Settings::LockGeneral::bLockpickingCrimeCheck)
+			if (MCM::Settings::LockGeneral::bLockpickingCrimeCheck.GetValue())
 			{
 				HandleCrime(a_refr);
 			}
@@ -800,13 +725,13 @@ namespace Hooks
 			switch (a_lockLevel)
 			{
 			case RE::LOCK_LEVEL::kAverage:
-				return MCM::Settings::LockRolls::iDCAdvanced;
+				return MCM::Settings::LockRolls::iDCAdvanced.GetValue();
 			case RE::LOCK_LEVEL::kHard:
-				return MCM::Settings::LockRolls::iDCExpert;
+				return MCM::Settings::LockRolls::iDCExpert.GetValue();
 			case RE::LOCK_LEVEL::kVeryHard:
-				return MCM::Settings::LockRolls::iDCMaster;
+				return MCM::Settings::LockRolls::iDCMaster.GetValue();
 			default:
-				return MCM::Settings::LockRolls::iDCNovice;
+				return MCM::Settings::LockRolls::iDCNovice.GetValue();
 			}
 		}
 
@@ -816,17 +741,13 @@ namespace Hooks
 			auto SkillMod = PlayerCharacter->GetActorValue(*Forms::LGND_LockPickSweetSpot);
 			auto SkillLvl = PlayerCharacter->GetActorValue(*GetSkillFromIndex());
 			auto SkillVal = SkillLvl * (1.0f + ((SkillMod) / 10.0f));
-			return MCM::Settings::LockRolls::iBonusPerSkill > 0
-			         ? static_cast<std::int32_t>(floorf(SkillVal / MCM::Settings::LockRolls::iBonusPerSkill))
-			         : 0;
+			return MCM::Settings::LockRolls::iBonusPerSkill.GetValue() > 0 ? static_cast<std::int32_t>(floorf(SkillVal / MCM::Settings::LockRolls::iBonusPerSkill.GetValue())) : 0;
 		}
 
 		static std::int32_t GetRollModifier_Lucky()
 		{
 			auto LuckyVal = RE::PlayerCharacter::GetSingleton()->GetActorValue(*(RE::ActorValue::GetSingleton()->luck));
-			return MCM::Settings::LockRolls::iBonusPerLucky > 0
-			         ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::LockRolls::iBonusPerLucky))
-			         : 0;
+			return MCM::Settings::LockRolls::iBonusPerLucky.GetValue() > 0 ? static_cast<std::int32_t>(floorf(LuckyVal / MCM::Settings::LockRolls::iBonusPerLucky.GetValue())) : 0;
 		}
 
 		static std::int32_t GetRollModifier_Perks()
@@ -836,7 +757,7 @@ namespace Hooks
 			{
 				if (BakaAutoShared::PlayerHasPerk(form))
 				{
-					result += MCM::Settings::LockRolls::iBonusPerPerks;
+					result += MCM::Settings::LockRolls::iBonusPerPerks.GetValue();
 				}
 			}
 
@@ -845,7 +766,7 @@ namespace Hooks
 
 		static std::int32_t GetRollModifier_Bonus()
 		{
-			return MCM::Settings::LockRolls::iBonusPerBonus;
+			return MCM::Settings::LockRolls::iBonusPerBonus.GetValue();
 		}
 
 		static std::int32_t GetRollModifier()
@@ -860,7 +781,7 @@ namespace Hooks
 		static RE::ActorValueInfo* GetSkillFromIndex()
 		{
 			auto ActorValue = RE::ActorValue::GetSingleton();
-			switch (MCM::Settings::LockGeneral::iSkillIndex)
+			switch (MCM::Settings::LockGeneral::iSkillIndex.GetValue())
 			{
 			case 0:
 				return ActorValue->strength;
@@ -877,7 +798,7 @@ namespace Hooks
 			case 6:
 				return ActorValue->luck;
 			default:
-				return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::LockGeneral::sSkillName);
+				return RE::TESForm::GetFormByEditorID<RE::ActorValueInfo>(MCM::Settings::LockGeneral::sSkillName.GetValue());
 			}
 		}
 
@@ -918,11 +839,7 @@ namespace Hooks
 				if (ProcessLists->RequestHighestDetectionLevelAgainstActor(PlayerCharacter, LOSCount) > 0)
 				{
 					auto CrimeChance{ 1.0f };
-					RE::BGSEntryPoint::HandleEntryPoint(
-						RE::BGSEntryPoint::ENTRY_POINT::kModLockpickingCrimeChance,
-						PlayerCharacter,
-						a_refr,
-						&CrimeChance);
+					RE::BGSEntryPoint::HandleEntryPoint(RE::BGSEntryPoint::ENTRY_POINT::kModLockpickingCrimeChance, PlayerCharacter, a_refr, &CrimeChance);
 
 					auto Chance = 0.0f;
 					if (Chance < CrimeChance)
@@ -977,19 +894,14 @@ namespace Hooks
 				if (!BakaAutoShared::PlayerHasItem(a_key))
 				{
 					auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
-					PlayerCharacter->AddObjectToContainer(
-						a_key,
-						nullptr,
-						1,
-						nullptr,
-						RE::ITEM_REMOVE_REASON::kNone);
+					PlayerCharacter->AddObjectToContainer(a_key, nullptr, 1, nullptr, RE::ITEM_REMOVE_REASON::kNone);
 				}
 			}
 		}
 
 		static bool PlayerHasBreakable()
 		{
-			if (MCM::Settings::LockGeneral::bUnbreakableLockpicks)
+			if (MCM::Settings::LockGeneral::bUnbreakableLockpicks.GetValue())
 			{
 				return false;
 			}
@@ -1009,7 +921,7 @@ namespace Hooks
 
 		static bool PlayerHasWaxKey()
 		{
-			if (MCM::Settings::LockGeneral::bGiveWaxKeys)
+			if (MCM::Settings::LockGeneral::bGiveWaxKeys.GetValue())
 			{
 				return true;
 			}
@@ -1024,10 +936,10 @@ namespace Hooks
 
 			if (a_picked)
 			{
-				if (auto LocksPicked = RE::LocksPicked::GetEventSource())
-				{
-					LocksPicked->Notify(RE::LocksPicked::Event{});
-				}
+				// if (auto LocksPicked = RE::LocksPicked::GetEventSource())
+				// {
+				// 	LocksPicked->Notify(RE::LocksPicked::Event{});
+				// }
 
 				if (auto BGSStoryEventManager = RE::BGSStoryEventManager::GetSingleton())
 				{
@@ -1038,7 +950,7 @@ namespace Hooks
 			}
 
 			RE::UIUtils::PlayMenuSound("UILockpickingUnlock");
-			if ((MCM::Settings::LockGeneral::bActivateContAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kCONT)) || (MCM::Settings::LockGeneral::bActivateDoorAfterPick && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kDOOR)))
+			if ((MCM::Settings::LockGeneral::bActivateContAfterPick.GetValue() && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kCONT)) || (MCM::Settings::LockGeneral::bActivateDoorAfterPick.GetValue() && (a_refr->data.objectReference && a_refr->data.objectReference->GetFormType() == RE::ENUM_FORM_ID::kDOOR)))
 			{
 				a_refr->ActivateRef(RE::PlayerCharacter::GetSingleton(), nullptr, 1, false, false, false);
 			}
