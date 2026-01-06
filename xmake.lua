@@ -6,7 +6,7 @@ includes("lib/commonlibf4")
 
 -- set project
 set_project("BakaAutoLockpicking")
-set_version("2.0.0")
+set_version("4.0.0")
 set_license("GPL-3.0")
 
 -- set defaults
@@ -14,7 +14,6 @@ set_languages("c++23")
 set_warnings("allextra")
 
 -- set policies
-set_policy("build.optimization.lto", true)
 set_policy("package.requires_lock", true)
 
 -- add rules
@@ -22,8 +21,8 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- set config
-set_config("f4se_xbyak", true)
-set_config("rex_ini", true)
+set_config("commonlib_ini", true)
+set_config("commonlib_xbyak", true)
 
 -- require package dependencies
 add_requires("effolkronium-random")

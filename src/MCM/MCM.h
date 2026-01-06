@@ -79,7 +79,7 @@ namespace MCM::Settings
 			auto BSScaleformManager = RE::BSScaleformManager::GetSingleton();
 			if (BSScaleformManager && BSScaleformManager->loader)
 			{
-				if (auto BSScaleformTranslator = static_cast<RE::BSScaleformTranslator*>(BSScaleformManager->loader->GetStateAddRef(RE::Scaleform::GFx::State::StateType::kTranslator)))
+				if (auto BSScaleformTranslator = static_cast<RE::BSScaleformTranslator*>(BSScaleformManager->loader->GetStateAddRef(Scaleform::GFx::State::StateType::kTranslator)))
 				{
 					auto FetchTranslation = [](RE::BSScaleformTranslator* a_trns, const wchar_t* a_key, std::string& a_output)
 					{
@@ -104,15 +104,15 @@ namespace MCM::Settings
 
 	static void Load(bool a_firstRun)
 	{
-		const auto ini = REX::INI::SettingStore::GetSingleton();
 		if (a_firstRun)
 		{
-			ini->Init(
-				"Data/F4SE/plugins/BakaAutoLockpicking.ini",
-				"Data/F4SE/plugins/BakaAutoLockpickingCustom.ini");
 			Formatting::Load();
 		}
 
+		const auto ini = REX::INI::SettingStore::GetSingleton();
+		ini->Init(
+			"Data/F4SE/plugins/BakaAutoLockpicking.ini",
+			"Data/F4SE/plugins/BakaAutoLockpickingCustom.ini");
 		ini->Load();
 	}
 }

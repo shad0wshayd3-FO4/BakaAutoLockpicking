@@ -251,7 +251,7 @@ namespace Hooks
 				if (MCM::Settings::HackGeneral::bShowRollResults.GetValue())
 				{
 					auto results = std::vformat(MCM::Settings::Formatting::sShowRollResults, std::make_format_args(LockVal, RollVal, RollMod));
-					F4SE::log::info("{}"sv, results);
+					REX::INFO("{}"sv, results);
 					RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
 				}
 
@@ -405,17 +405,17 @@ namespace Hooks
 
 		static void HandleExperience(RE::LOCK_LEVEL a_lockLevel)
 		{
-			RE::DIFFICULTY_LEVEL Difficulty{ RE::DIFFICULTY_LEVEL::kEasy };
+			RE::DifficultyLevel Difficulty{ RE::DifficultyLevel::kEasy };
 			switch (a_lockLevel)
 			{
 			case RE::LOCK_LEVEL::kAverage:
-				Difficulty = RE::DIFFICULTY_LEVEL::kNormal;
+				Difficulty = RE::DifficultyLevel::kNormal;
 				break;
 			case RE::LOCK_LEVEL::kHard:
-				Difficulty = RE::DIFFICULTY_LEVEL::kHard;
+				Difficulty = RE::DifficultyLevel::kHard;
 				break;
 			case RE::LOCK_LEVEL::kVeryHard:
-				Difficulty = RE::DIFFICULTY_LEVEL::kVeryHard;
+				Difficulty = RE::DifficultyLevel::kVeryHard;
 				break;
 			default:
 				break;
@@ -423,7 +423,7 @@ namespace Hooks
 
 			auto reward =
 				RE::GamePlayFormulas::GetExperienceReward(
-					RE::GamePlayFormulas::EXPERIENCE_ACTIVITY::kHackComputer,
+					RE::GamePlayFormulas::ExperienceActivity::kHackComputer,
 					Difficulty,
 					-1.0f);
 			RE::PlayerCharacter::GetSingleton()->RewardExperience(reward, false, nullptr, nullptr);
@@ -686,7 +686,7 @@ namespace Hooks
 			if (MCM::Settings::LockGeneral::bShowRollResults.GetValue())
 			{
 				auto results = std::vformat(MCM::Settings::Formatting::sShowRollResults, std::make_format_args(LockVal, RollVal, RollMod));
-				F4SE::log::info("{}"sv, results);
+				REX::INFO("{}"sv, results);
 				RE::SendHUDMessage::ShowHUDMessage(results.data(), nullptr, false, false);
 			}
 
@@ -845,7 +845,7 @@ namespace Hooks
 					if (Chance < CrimeChance)
 					{
 						auto Prison = PlayerCharacter->currentPrisonFaction;
-						if (Prison && Prison->crimeData.crimevalues.escapeCrimeGold)
+						if (Prison && Prison->crimeData.crimeValues.escapeCrimeGold)
 						{
 							PlayerCharacter->SetEscaping(true, false);
 						}
@@ -936,10 +936,10 @@ namespace Hooks
 
 			if (a_picked)
 			{
-				// if (auto LocksPicked = RE::LocksPicked::GetEventSource())
-				// {
-				// 	LocksPicked->Notify(RE::LocksPicked::Event{});
-				// }
+				if (auto LocksPicked = RE::LocksPicked::GetEventSource())
+				{
+					LocksPicked->Notify(RE::LocksPicked::Event{});
+				}
 
 				if (auto BGSStoryEventManager = RE::BGSStoryEventManager::GetSingleton())
 				{

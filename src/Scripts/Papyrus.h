@@ -38,7 +38,7 @@ namespace Papyrus::BakaAutoLock
 		a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiers", ShowRollModifiers);
 		a_vm->BindNativeMethod(CLASS_NAME, "ShowRollModifiersHack", ShowRollModifiersHack);
 		a_vm->BindNativeMethod(CLASS_NAME, "UpdateSettings", UpdateSettings);
-		F4SE::log::info("Registered funcs for class {}"sv, CLASS_NAME);
+		REX::DEBUG("Registered funcs for class {}"sv, CLASS_NAME);
 
 		return true;
 	}

@@ -33,13 +33,10 @@ namespace
 	}
 }
 
-F4SEPluginLoad(const F4SE::LoadInterface* a_F4SE)
+F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 {
-	F4SE::Init(a_F4SE);
-	F4SE::AllocTrampoline(256);
-
+	F4SE::Init(a_f4se, { .trampoline = true, .trampolineSize = 256 });
 	F4SE::GetMessagingInterface()->RegisterListener(MessageHandler);
 	F4SE::GetPapyrusInterface()->Register(Papyrus::BakaAutoLock::Register);
-
 	return true;
 }
