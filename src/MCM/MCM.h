@@ -1,118 +1,169 @@
 #pragma once
 
-namespace MCM::Settings
+namespace MCM
 {
-	namespace LockGeneral
+	class Settings
 	{
-		static REX::INI::Bool bActivateContAfterPick{ "LockGeneral", "bActivateContAfterPick", false };
-		static REX::INI::Bool bActivateDoorAfterPick{ "LockGeneral", "bActivateDoorAfterPick", true };
-		static REX::INI::Bool bGiveWaxKeys{ "LockGeneral", "bGiveWaxKeys", false };
-		static REX::INI::Bool bIgnoreHasKey{ "LockGeneral", "bIgnoreHasKey", false };
-		static REX::INI::Bool bIgnoreLockGates{ "LockGeneral", "bIgnoreLockGates", false };
-		static REX::INI::Bool bLockpickingCrimeCheck{ "LockGeneral", "bLockpickingCrimeCheck", true };
-		static REX::INI::Bool bModEnabled{ "LockGeneral", "bModEnabled", true };
-		static REX::INI::Bool bShowRollResults{ "LockGeneral", "bShowRollResults", false };
-		static REX::INI::Bool bUnbreakableLockpicks{ "LockGeneral", "bUnbreakableLockpicks", false };
-
-		static REX::INI::I32 iDetectionEventFailureLevel{ "LockGeneral", "iDetectionEventFailureLevel", 0 };
-		static REX::INI::I32 iDetectionEventSuccessLevel{ "LockGeneral", "iDetectionEventSuccessLevel", 0 };
-		static REX::INI::I32 iSkillIndex{ "LockGeneral", "iSkillIndex", 1 };
-		static REX::INI::Str sSkillName{ "LockGeneral", "sSkillName", "Perception"s };
-	}
-
-	namespace LockRolls
-	{
-		static REX::INI::I32 iDCNovice{ "LockRolls", "iDCNovice", 8 };
-		static REX::INI::I32 iDCAdvanced{ "LockRolls", "iDCAdvanced", 12 };
-		static REX::INI::I32 iDCExpert{ "LockRolls", "iDCExpert", 16 };
-		static REX::INI::I32 iDCMaster{ "LockRolls", "iDCMaster", 20 };
-		static REX::INI::I32 iPlayerDiceMin{ "LockRolls", "iPlayerDiceMin", 1 };
-		static REX::INI::I32 iPlayerDiceMax{ "LockRolls", "iPlayerDiceMax", 20 };
-		static REX::INI::I32 iBonusPerBonus{ "LockRolls", "iBonusPerBonus", 0 };
-		static REX::INI::I32 iBonusPerLucky{ "LockRolls", "iBonusPerLucky", 5 };
-		static REX::INI::I32 iBonusPerPerks{ "LockRolls", "iBonusPerPerks", 1 };
-		static REX::INI::I32 iBonusPerSkill{ "LockRolls", "iBonusPerSkill", 2 };
-	}
-
-	namespace HackGeneral
-	{
-		static REX::INI::Bool bActivateTermAfterHack{ "HackGeneral", "bActivateTermAfterHack", true };
-		static REX::INI::Bool bGivePass{ "HackGeneral", "bGivePass", false };
-		static REX::INI::Bool bIgnoreHasPass{ "HackGeneral", "bIgnoreHasPass", false };
-		static REX::INI::Bool bIgnoreHackGates{ "HackGeneral", "bIgnoreHackGates", false };
-		static REX::INI::Bool bHackingCrimeCheck{ "HackGeneral", "bHackingCrimeCheck", true };
-		static REX::INI::Bool bModEnabled{ "HackGeneral", "bModEnabled", true };
-		static REX::INI::Bool bShowRollResults{ "HackGeneral", "bShowRollResults", false };
-		static REX::INI::Bool bNoTimeouts{ "HackGeneral", "bNoTimeouts", false };
-
-		static REX::INI::I32 iDetectionEventFailureLevel{ "HackGeneral", "iDetectionEventFailureLevel", 0 };
-		static REX::INI::I32 iDetectionEventSuccessLevel{ "HackGeneral", "iDetectionEventSuccessLevel", 0 };
-		static REX::INI::I32 iSkillIndex{ "HackGeneral", "iSkillIndex", 4 };
-		static REX::INI::Str sSkillName{ "HackGeneral", "sSkillName", "Intelligence"s };
-	}
-
-	namespace HackRolls
-	{
-		static REX::INI::I32 iDCNovice{ "HackRolls", "iDCNovice", 8 };
-		static REX::INI::I32 iDCAdvanced{ "HackRolls", "iDCAdvanced", 12 };
-		static REX::INI::I32 iDCExpert{ "HackRolls", "iDCExpert", 16 };
-		static REX::INI::I32 iDCMaster{ "HackRolls", "iDCMaster", 20 };
-		static REX::INI::I32 iPlayerDiceMin{ "HackRolls", "iPlayerDiceMin", 1 };
-		static REX::INI::I32 iPlayerDiceMax{ "HackRolls", "iPlayerDiceMax", 20 };
-		static REX::INI::I32 iBonusPerBonus{ "HackRolls", "iBonusPerBonus", 0 };
-		static REX::INI::I32 iBonusPerLucky{ "HackRolls", "iBonusPerLucky", 5 };
-		static REX::INI::I32 iBonusPerPerks{ "HackRolls", "iBonusPerPerks", 1 };
-		static REX::INI::I32 iBonusPerSkill{ "HackRolls", "iBonusPerSkill", 2 };
-	}
-
-	namespace Formatting
-	{
-		inline static std::string sBonus;
-		inline static std::string sLucky;
-		inline static std::string sPerks;
-		inline static std::string sSkill;
-		inline static std::string sTotal;
-		inline static std::string sShowRollResults;
-
-		static void Load()
+	public:
+		class General
 		{
-			auto BSScaleformManager = RE::BSScaleformManager::GetSingleton();
-			if (BSScaleformManager && BSScaleformManager->loader)
-			{
-				if (auto BSScaleformTranslator = static_cast<RE::BSScaleformTranslator*>(BSScaleformManager->loader->GetStateAddRef(Scaleform::GFx::State::StateType::kTranslator)))
-				{
-					auto FetchTranslation = [](RE::BSScaleformTranslator* a_trns, const wchar_t* a_key, std::string& a_output)
-					{
-						auto it = a_trns->translator.translationMap.find(a_key);
-						if (it != a_trns->translator.translationMap.end())
-						{
-							a_output.resize(512);
-							sprintf_s(a_output.data(), 512, "%ws", it->second.data());
-						}
-					};
+		public:
+			inline static REX::INI::Bool bEnable{ "General", "bEnable", true };
+		};
 
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Bonus", sBonus);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Lucky", sLucky);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Perks", sPerks);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Skill", sSkill);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_Total", sTotal);
-					FetchTranslation(BSScaleformTranslator, L"$BakaAL_Message_ShowRollResults", sShowRollResults);
+		class AutoHack
+		{
+		public:
+			class Rolls
+			{
+			public:
+				inline static REX::INI::I32 iLockDC0{ "AutoHackRNG", "iLockDC0", 40 };
+				inline static REX::INI::I32 iLockDC1{ "AutoHackRNG", "iLockDC1", 60 };
+				inline static REX::INI::I32 iLockDC2{ "AutoHackRNG", "iLockDC2", 80 };
+				inline static REX::INI::I32 iLockDC3{ "AutoHackRNG", "iLockDC3", 100 };
+				inline static REX::INI::I32 iRollMin{ "AutoHackRNG", "iRollMin", 1 };
+				inline static REX::INI::I32 iRollMax{ "AutoHackRNG", "iRollMax", 100 };
+				inline static REX::INI::I32 iModPerStat{ "AutoHackRNG", "iModPerStat", 3 };
+				inline static REX::INI::I32 iModPerLuck{ "AutoHackRNG", "iModPerLuck", 1 };
+				inline static REX::INI::I32 iModPerPerk{ "AutoHackRNG", "iModPerPerk", 20 };
+				inline static REX::INI::I32 iModBonus{ "AutoHackRNG", "iModBonus", 0 };
+				inline static REX::INI::Str sStatName{ "AutoHackRNG", "sStatName", "Intelligence"s };
+			};
+
+			class Runtime
+			{
+			public:
+				inline static RE::ActorValueInfo* BakaAutoHackVoice{ nullptr };
+				inline static RE::ActorValueInfo* BakaAutoHackAttempts{ nullptr };
+				inline static RE::BGSListForm*    Items_Lockpick{ nullptr };
+				inline static RE::BGSListForm*    Perks_Mod{ nullptr };
+				inline static RE::BGSListForm*    Perks_Unbreakable{ nullptr };
+				inline static RE::BGSListForm*    Perks_WaxKey{ nullptr };
+			};
+
+			inline static REX::INI::Bool bEnableAutoHack{ "AutoHack", "bEnableAutoHack", true };
+			inline static REX::INI::Bool bActivateTERM{ "AutoHack", "bActivateTERM", true };
+			inline static REX::INI::Bool bExperienceFromKeys{ "AutoHack", "bExperienceFromKeys", true };
+			inline static REX::INI::Bool bForceUnbreakable{ "AutoHack", "bForceUnbreakable", false };
+			inline static REX::INI::Bool bForceWaxKey{ "AutoHack", "bForceWaxKey", false };
+			inline static REX::INI::Bool bNoCrime{ "AutoHack", "bNoCrime", false };
+			inline static REX::INI::Bool bNoKeyUse{ "AutoHack", "bNoKeyUse", false };
+			inline static REX::INI::Bool bNoPickGates{ "AutoHack", "bNoPickGates", true };
+			inline static REX::INI::Bool bShowRollResults{ "AutoHack", "bShowRollResults", false };
+			inline static REX::INI::I32  iDetectionEventSuccess{ "AutoHack", "iDetectionEventSuccess", 0 };
+			inline static REX::INI::I32  iDetectionEventFailure{ "AutoHack", "iDetectionEventFailure", 0 };
+		};
+
+		class AutoPick
+		{
+		public:
+			class Rolls
+			{
+			public:
+				inline static REX::INI::I32 iLockDC0{ "AutoPickRNG", "iLockDC0", 40 };
+				inline static REX::INI::I32 iLockDC1{ "AutoPickRNG", "iLockDC1", 60 };
+				inline static REX::INI::I32 iLockDC2{ "AutoPickRNG", "iLockDC2", 80 };
+				inline static REX::INI::I32 iLockDC3{ "AutoPickRNG", "iLockDC3", 100 };
+				inline static REX::INI::I32 iRollMin{ "AutoPickRNG", "iRollMin", 1 };
+				inline static REX::INI::I32 iRollMax{ "AutoPickRNG", "iRollMax", 100 };
+				inline static REX::INI::I32 iModPerStat{ "AutoPickRNG", "iModPerStat", 3 };
+				inline static REX::INI::I32 iModPerLuck{ "AutoPickRNG", "iModPerLuck", 1 };
+				inline static REX::INI::I32 iModPerPerk{ "AutoPickRNG", "iModPerPerk", 20 };
+				inline static REX::INI::I32 iModBonus{ "AutoPickRNG", "iModBonus", 0 };
+				inline static REX::INI::Str sStatName{ "AutoPickRNG", "sStatName", "Perception"s };
+			};
+
+			class Runtime
+			{
+			public:
+				inline static RE::ActorValueInfo* BakaAutoPickVoice{ nullptr };
+				inline static RE::ActorValueInfo* LGND_LockPickSweetSpot{ nullptr };
+				inline static RE::BGSListForm*    Items_Lockpick{ nullptr };
+				inline static RE::BGSListForm*    Perks_Mod{ nullptr };
+				inline static RE::BGSListForm*    Perks_Unbreakable{ nullptr };
+				inline static RE::BGSListForm*    Perks_WaxKey{ nullptr };
+			};
+
+			inline static REX::INI::Bool bEnableAutoPick{ "AutoPick", "bEnableAutoPick", true };
+			inline static REX::INI::Bool bActivateCONT{ "AutoPick", "bActivateCONT", false };
+			inline static REX::INI::Bool bActivateDOOR{ "AutoPick", "bActivateDOOR", true };
+			inline static REX::INI::Bool bExperienceFromKeys{ "AutoPick", "bExperienceFromKeys", true };
+			inline static REX::INI::Bool bForceUnbreakable{ "AutoPick", "bForceUnbreakable", false };
+			inline static REX::INI::Bool bForceWaxKey{ "AutoPick", "bForceWaxKey", false };
+			inline static REX::INI::Bool bNoCrime{ "AutoPick", "bNoCrime", false };
+			inline static REX::INI::Bool bNoKeyUse{ "AutoPick", "bNoKeyUse", false };
+			inline static REX::INI::Bool bNoPickGates{ "AutoPick", "bNoPickGates", true };
+			inline static REX::INI::Bool bShowRollResults{ "AutoPick", "bShowRollResults", false };
+			inline static REX::INI::I32  iDetectionEventSuccess{ "AutoPick", "iDetectionEventSuccess", 0 };
+			inline static REX::INI::I32  iDetectionEventFailure{ "AutoPick", "iDetectionEventFailure", 0 };
+		};
+
+		static void Update()
+		{
+			PreUpdate();
+
+			const auto ini = REX::INI::SettingStore::GetSingleton();
+			ini->Init(
+				"Data/MCM/Config/BakaAutoLockpicking/settings.ini",
+				"Data/MCM/Settings/BakaAutoLockpicking.ini");
+			ini->Load();
+
+			PosUpdate();
+		}
+
+	private:
+		static void PosUpdate()
+		{
+			if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton())
+			{
+				PlayerCharacter->SetActorValue(*AutoHack::Runtime::BakaAutoHackVoice, 1.0f);
+				PlayerCharacter->SetActorValue(*AutoPick::Runtime::BakaAutoPickVoice, 1.0f);
+
+				if (MCM::Settings::General::bEnable)
+				{
+					if (MCM::Settings::AutoHack::bEnableAutoHack && MCM::Settings::AutoHack::bNoPickGates)
+					{
+						PlayerCharacter->SetActorValue(*AutoHack::Runtime::BakaAutoHackVoice, 0.0f);
+					}
+
+					if (MCM::Settings::AutoPick::bNoPickGates)
+					{
+						PlayerCharacter->SetActorValue(*AutoHack::Runtime::BakaAutoHackVoice, 0.0f);
+					}
 				}
 			}
 		}
-	}
 
-	static void Load(bool a_firstRun)
-	{
-		if (a_firstRun)
+		static void PreUpdate()
 		{
-			Formatting::Load();
+			if (bRegistered)
+			{
+				return;
+			}
+
+			if (auto UI = RE::UI::GetSingleton())
+			{
+				UI->RegisterSink<RE::MenuOpenCloseEvent>(EventHandler::GetSingleton());
+				bRegistered = true;
+			}
 		}
 
-		const auto ini = REX::INI::SettingStore::GetSingleton();
-		ini->Init(
-			"Data/F4SE/plugins/BakaAutoLockpicking.ini",
-			"Data/F4SE/plugins/BakaAutoLockpickingCustom.ini");
-		ini->Load();
-	}
+		class EventHandler :
+			public RE::BSTEventSink<RE::MenuOpenCloseEvent>,
+			public REX::Singleton<EventHandler>
+		{
+		public:
+			virtual RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent& a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override
+			{
+				if (a_event.menuName == "PauseMenu" && !a_event.opening)
+				{
+					MCM::Settings::Update();
+				}
+
+				return RE::BSEventNotifyControl::kContinue;
+			}
+		};
+
+		inline static bool bRegistered{ false };
+	};
 }

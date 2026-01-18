@@ -27,15 +27,15 @@
             },
             version = "1.12.1"
         },
-        ["simpleini#f56260b5"] = {
+        ["simpleini v4.25#f56260b5"] = {
             repo = {
                 branch = "master",
-                commit = "6e0aa54f304434eba0e87e3715b0b20f6a109aba",
+                commit = "2e1b098a67288fdbb197e206c7d5bba2168a9a59",
                 url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "v4.22"
+            version = "v4.25"
         },
-        ["spdlog#09c8c173"] = {
+        ["spdlog v1.16.0#09c8c173"] = {
             repo = {
                 branch = "master",
                 commit = "fe2a73b07622d172ec4f8584418500fb945c51cd",
@@ -43,7 +43,7 @@
             },
             version = "v1.16.0"
         },
-        ["xbyak#f56260b5"] = {
+        ["xbyak v7.06#f56260b5"] = {
             repo = {
                 branch = "master",
                 commit = "fe2a73b07622d172ec4f8584418500fb945c51cd",
