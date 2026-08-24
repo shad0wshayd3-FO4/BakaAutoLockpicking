@@ -37,3 +37,8 @@ target("BakaAutoLockpicking")
 
     -- add extra files
     add_extrafiles(".clang-format")
+
+    -- add install files
+    add_installfiles("res/Interface/**.txt",        { prefixdir = "Interface/Translations" })
+    add_installfiles("res/MCM/**.*",                { prefixdir = "MCM/Config/BakaAutoLockpicking" })
+    add_installfiles("res/BakaAutoLockpicking.esm", { prefixdir = "" })
