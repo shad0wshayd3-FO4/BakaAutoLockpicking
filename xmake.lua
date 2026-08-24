@@ -1,45 +1,33 @@
--- set minimum xmake version
-set_xmakever("2.9.4")
-
--- includes
+-- include subprojects
 includes("lib/commonlibf4")
 
--- set project
+-- set project constants
 set_project("BakaAutoLockpicking")
 set_version("4.0.0")
 set_license("GPL-3.0")
-
--- set defaults
 set_languages("c++23")
 set_warnings("allextra")
 
--- set policies
-set_policy("package.requires_lock", true)
-
--- add rules
+-- add common rules
 add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
--- set config
+-- set configs
 set_config("commonlib_ini", true)
 set_config("commonlib_xbyak", true)
 
 -- require package dependencies
 add_requires("effolkronium-random")
 
--- targets
+-- define targets
 target("BakaAutoLockpicking")
-    -- bind local dependencies
-    add_deps("commonlibf4")
-
-    -- bind package dependencies
-    add_packages("effolkronium-random")
-
-    -- add commonlibf4 plugin
     add_rules("commonlibf4.plugin", {
         name = "BakaAutoLockpicking",
         author = "shad0wshayd3"
     })
+
+    -- bind package dependencies
+    add_packages("effolkronium-random")
 
     -- add src files
     add_files("src/**.cpp")
