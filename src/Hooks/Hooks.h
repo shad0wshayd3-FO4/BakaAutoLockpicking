@@ -138,7 +138,7 @@ namespace Hooks
 
 	template <class T>
 	class AutoBase :
-		public REX::Singleton<AutoBase<T>>
+		public REX::TSingleton<AutoBase<T>>
 	{
 	public:
 		static std::int32_t GetLockDC(RE::LOCK_LEVEL a_lockLevel)
@@ -188,7 +188,8 @@ namespace Hooks
 		{
 			auto min = std::max<std::int32_t>(1, T::Rolls::iRollMin);
 			auto max = std::max<std::int32_t>(min, T::Rolls::iRollMax);
-			return effolkronium::random_thread_local::get<std::int32_t>(min, max);
+			static REX::RNG::I32 rng;
+			return rng.Generate(min, max);
 		}
 
 		static RE::ActorValueInfo* GetStatByName()
@@ -257,7 +258,7 @@ namespace Hooks
 
 			if (T::bShowRollResults)
 			{
-				REX::INFO("DC: {} | Roll: {}+{}", LockMod, RollRNG, RollMod);
+				REX::INFO("DC: {} | Roll: {}+{}"sv, LockMod, RollRNG, RollMod);
 			}
 
 			return ((RollRNG + RollMod) >= LockMod);
@@ -371,7 +372,7 @@ namespace Hooks
 					{
 						a_refr->SetActorValue(*MCM::Settings::AutoHack::Runtime::BakaAutoHackAttempts, 0.0f);
 						PlayerCharacter->LockOutOfTerminal(a_refr->GetHandle());
-						detail::ShowMessage("sTerminalLockout");
+						detail::ShowMessage("sTerminalLockout"sv);
 					}
 					else
 					{
@@ -471,7 +472,7 @@ namespace Hooks
 
 				if (RE::BGSTerminal::IsTerminalRefInUse(a_itemActivated))
 				{
-					detail::ShowMessage("sObjectInUse");
+					detail::ShowMessage("sObjectInUse"sv);
 					return false;
 				}
 
@@ -509,14 +510,14 @@ namespace Hooks
 						if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton();
 							PlayerCharacter && PlayerCharacter->IsLockedOutOfTerminal(a_itemActivated->GetHandle()))
 						{
-							detail::ShowMessage("sTerminalLockout");
+							detail::ShowMessage("sTerminalLockout"sv);
 							return false;
 						}
 					}
 
 					if (!CanAutoHack(LockLevel))
 					{
-						detail::ShowMessage("sHackingGateFail");
+						detail::ShowMessage("sHackingGateFail"sv);
 						return false;
 					}
 
@@ -550,7 +551,7 @@ namespace Hooks
 				return _Activate0(a_this, a_itemActivated, a_actionRef, a_objectToGet, a_count);
 			}
 
-			inline static REL::HookVFT _Activate0{ RE::BGSTerminal::VTABLE[0], 0x40, Activate };  // BGSTerminal::Activate
+			inline static REL::THookVFT _Activate0{ RE::BGSTerminal::VTABLE[0], 0x40, Activate };  // BGSTerminal::Activate
 		};
 	};
 
@@ -603,8 +604,8 @@ namespace Hooks
 						auto crimeChance{ 1.0f };
 						RE::BGSEntryPoint::HandleEntryPoint(RE::BGSEntryPoint::ENTRY_POINT::kModLockpickingCrimeChance, PlayerCharacter, a_refr, &crimeChance);
 
-						auto crimeRoll = effolkronium::random_thread_local::get<float>(0.0f, 1.0f);
-						if (crimeRoll < crimeChance)
+						static REX::RNG::F32 rng;
+						if (rng.Generate(0.0f, 1.0f) < crimeChance)
 						{
 							if (PlayerCharacter->currentPrisonFaction &&
 								PlayerCharacter->currentPrisonFaction->crimeData.crimeValues.escapeCrimeGold > 0)
@@ -614,7 +615,7 @@ namespace Hooks
 							else
 							{
 								PlayerCharacter->TrespassAlarm(a_refr, owner, -1);
-								detail::ShowMessage("sLockpickingCaught");
+								detail::ShowMessage("sLockpickingCaught"sv);
 							}
 						}
 					}
@@ -681,7 +682,7 @@ namespace Hooks
 			{
 				if (detail::Player::HasObject(Lock->key))
 				{
-					detail::ShowMessage("sOpenWithKey", Lock->key->GetFullName());
+					detail::ShowMessage("sOpenWithKey"sv, Lock->key->GetFullName());
 
 					HandleUnlock(a_refr, false);
 					if (MCM::Settings::AutoPick::bExperienceFromKeys)
@@ -691,12 +692,12 @@ namespace Hooks
 				}
 				else
 				{
-					detail::ShowMessage("sAutoLockPickKeyOnly", Lock->key->GetFullName());
+					detail::ShowMessage("sAutoLockPickKeyOnly"sv, Lock->key->GetFullName());
 				}
 			}
 			else
 			{
-				detail::ShowMessage("sAutoLockPickNoKey");
+				detail::ShowMessage("sAutoLockPickNoKey"sv);
 			}
 		}
 
@@ -735,8 +736,8 @@ namespace Hooks
 				return false;
 			}
 
-			inline static REL::Hook _HasObjects0{ REL::ID(2198652), 0x111, HasObjects };  // TESObjectCONT::Activate
-			inline static REL::Hook _HasObjects1{ REL::ID(2198689), 0x2A7, HasObjects };  // TESObjectDOOR::Activate
+			inline static REL::THook _HasObjects0{ REL::ID(2198652), 0x111, HasObjects };  // TESObjectCONT::Activate
+			inline static REL::THook _HasObjects1{ REL::ID(2198689), 0x2A7, HasObjects };  // TESObjectDOOR::Activate
 		};
 
 		class hkTryUnlockObject
@@ -772,13 +773,13 @@ namespace Hooks
 					return false;
 
 				case RE::LOCK_LEVEL::kTerminal:
-					detail::ShowMessage("sAutoLockPickTerminal");
+					detail::ShowMessage("sAutoLockPickTerminal"sv);
 					return false;
 
 				case RE::LOCK_LEVEL::kInaccessible:
 				case RE::LOCK_LEVEL::kBarred:
 				case RE::LOCK_LEVEL::kChained:
-					detail::ShowMessage("sAutoLockPickInaccessible");
+					detail::ShowMessage("sAutoLockPickInaccessible"sv);
 					return false;
 
 				default:
@@ -787,13 +788,13 @@ namespace Hooks
 
 				if (!HasLockpick())
 				{
-					detail::ShowMessage("sAutoLockPickNoPicks");
+					detail::ShowMessage("sAutoLockPickNoPicks"sv);
 					return false;
 				}
 
 				if (!CanAutoPick(LockLevel))
 				{
-					detail::ShowMessage("sAutoLockPickGateFail");
+					detail::ShowMessage("sAutoLockPickGateFail"sv);
 					return false;
 				}
 
@@ -824,8 +825,8 @@ namespace Hooks
 				return false;
 			}
 
-			inline static REL::Hook _TryUnlockObject0{ REL::ID(2198652), 0x1C0, TryUnlockObject };  // TESObjectCONT::Activate
-			inline static REL::Hook _TryUnlockObject1{ REL::ID(2198689), 0x397, TryUnlockObject };  // TESObjectDOOR::Activate
+			inline static REL::THook _TryUnlockObject0{ REL::ID(2198652), 0x1C0, TryUnlockObject };  // TESObjectCONT::Activate
+			inline static REL::THook _TryUnlockObject1{ REL::ID(2198689), 0x397, TryUnlockObject };  // TESObjectDOOR::Activate
 		};
 	};
 }

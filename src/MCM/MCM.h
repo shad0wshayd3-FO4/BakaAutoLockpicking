@@ -8,7 +8,7 @@ namespace MCM
 		class General
 		{
 		public:
-			inline static REX::INI::Bool bEnable{ "General", "bEnable", true };
+			inline static REX::INI::Bool bEnable{ "General"sv, "bEnable"sv, true };
 		};
 
 		class AutoHack
@@ -17,17 +17,17 @@ namespace MCM
 			class Rolls
 			{
 			public:
-				inline static REX::INI::I32 iLockDC0{ "AutoHackRNG", "iLockDC0", 40 };
-				inline static REX::INI::I32 iLockDC1{ "AutoHackRNG", "iLockDC1", 60 };
-				inline static REX::INI::I32 iLockDC2{ "AutoHackRNG", "iLockDC2", 80 };
-				inline static REX::INI::I32 iLockDC3{ "AutoHackRNG", "iLockDC3", 100 };
-				inline static REX::INI::I32 iRollMin{ "AutoHackRNG", "iRollMin", 1 };
-				inline static REX::INI::I32 iRollMax{ "AutoHackRNG", "iRollMax", 100 };
-				inline static REX::INI::I32 iModPerStat{ "AutoHackRNG", "iModPerStat", 3 };
-				inline static REX::INI::I32 iModPerLuck{ "AutoHackRNG", "iModPerLuck", 1 };
-				inline static REX::INI::I32 iModPerPerk{ "AutoHackRNG", "iModPerPerk", 20 };
-				inline static REX::INI::I32 iModBonus{ "AutoHackRNG", "iModBonus", 0 };
-				inline static REX::INI::Str sStatName{ "AutoHackRNG", "sStatName", "Intelligence"s };
+				inline static REX::INI::I32 iLockDC0{ "AutoHackRNG"sv, "iLockDC0"sv, 40 };
+				inline static REX::INI::I32 iLockDC1{ "AutoHackRNG"sv, "iLockDC1"sv, 60 };
+				inline static REX::INI::I32 iLockDC2{ "AutoHackRNG"sv, "iLockDC2"sv, 80 };
+				inline static REX::INI::I32 iLockDC3{ "AutoHackRNG"sv, "iLockDC3"sv, 100 };
+				inline static REX::INI::I32 iRollMin{ "AutoHackRNG"sv, "iRollMin"sv, 1 };
+				inline static REX::INI::I32 iRollMax{ "AutoHackRNG"sv, "iRollMax"sv, 100 };
+				inline static REX::INI::I32 iModPerStat{ "AutoHackRNG"sv, "iModPerStat"sv, 3 };
+				inline static REX::INI::I32 iModPerLuck{ "AutoHackRNG"sv, "iModPerLuck"sv, 1 };
+				inline static REX::INI::I32 iModPerPerk{ "AutoHackRNG"sv, "iModPerPerk"sv, 20 };
+				inline static REX::INI::I32 iModBonus{ "AutoHackRNG"sv, "iModBonus"sv, 0 };
+				inline static REX::INI::Str sStatName{ "AutoHackRNG"sv, "sStatName"sv, "Intelligence"s };
 			};
 
 			class Runtime
@@ -41,17 +41,17 @@ namespace MCM
 				inline static RE::BGSListForm*    Perks_WaxKey{ nullptr };
 			};
 
-			inline static REX::INI::Bool bEnableAutoHack{ "AutoHack", "bEnableAutoHack", true };
-			inline static REX::INI::Bool bActivateTERM{ "AutoHack", "bActivateTERM", true };
-			inline static REX::INI::Bool bExperienceFromKeys{ "AutoHack", "bExperienceFromKeys", true };
-			inline static REX::INI::Bool bForceUnbreakable{ "AutoHack", "bForceUnbreakable", false };
-			inline static REX::INI::Bool bForceWaxKey{ "AutoHack", "bForceWaxKey", false };
-			inline static REX::INI::Bool bNoCrime{ "AutoHack", "bNoCrime", false };
-			inline static REX::INI::Bool bNoKeyUse{ "AutoHack", "bNoKeyUse", false };
-			inline static REX::INI::Bool bNoPickGates{ "AutoHack", "bNoPickGates", true };
-			inline static REX::INI::Bool bShowRollResults{ "AutoHack", "bShowRollResults", false };
-			inline static REX::INI::I32  iDetectionEventSuccess{ "AutoHack", "iDetectionEventSuccess", 0 };
-			inline static REX::INI::I32  iDetectionEventFailure{ "AutoHack", "iDetectionEventFailure", 0 };
+			inline static REX::INI::Bool bEnableAutoHack{ "AutoHack"sv, "bEnableAutoHack"sv, true };
+			inline static REX::INI::Bool bActivateTERM{ "AutoHack"sv, "bActivateTERM"sv, true };
+			inline static REX::INI::Bool bExperienceFromKeys{ "AutoHack"sv, "bExperienceFromKeys"sv, true };
+			inline static REX::INI::Bool bForceUnbreakable{ "AutoHack"sv, "bForceUnbreakable"sv, false };
+			inline static REX::INI::Bool bForceWaxKey{ "AutoHack"sv, "bForceWaxKey"sv, false };
+			inline static REX::INI::Bool bNoCrime{ "AutoHack"sv, "bNoCrime"sv, false };
+			inline static REX::INI::Bool bNoKeyUse{ "AutoHack"sv, "bNoKeyUse"sv, false };
+			inline static REX::INI::Bool bNoPickGates{ "AutoHack"sv, "bNoPickGates"sv, true };
+			inline static REX::INI::Bool bShowRollResults{ "AutoHack"sv, "bShowRollResults"sv, false };
+			inline static REX::INI::I32  iDetectionEventSuccess{ "AutoHack"sv, "iDetectionEventSuccess"sv, 0 };
+			inline static REX::INI::I32  iDetectionEventFailure{ "AutoHack"sv, "iDetectionEventFailure"sv, 0 };
 		};
 
 		class AutoPick
@@ -60,17 +60,17 @@ namespace MCM
 			class Rolls
 			{
 			public:
-				inline static REX::INI::I32 iLockDC0{ "AutoPickRNG", "iLockDC0", 40 };
-				inline static REX::INI::I32 iLockDC1{ "AutoPickRNG", "iLockDC1", 60 };
-				inline static REX::INI::I32 iLockDC2{ "AutoPickRNG", "iLockDC2", 80 };
-				inline static REX::INI::I32 iLockDC3{ "AutoPickRNG", "iLockDC3", 100 };
-				inline static REX::INI::I32 iRollMin{ "AutoPickRNG", "iRollMin", 1 };
-				inline static REX::INI::I32 iRollMax{ "AutoPickRNG", "iRollMax", 100 };
-				inline static REX::INI::I32 iModPerStat{ "AutoPickRNG", "iModPerStat", 3 };
-				inline static REX::INI::I32 iModPerLuck{ "AutoPickRNG", "iModPerLuck", 1 };
-				inline static REX::INI::I32 iModPerPerk{ "AutoPickRNG", "iModPerPerk", 20 };
-				inline static REX::INI::I32 iModBonus{ "AutoPickRNG", "iModBonus", 0 };
-				inline static REX::INI::Str sStatName{ "AutoPickRNG", "sStatName", "Perception"s };
+				inline static REX::INI::I32 iLockDC0{ "AutoPickRNG"sv, "iLockDC0"sv, 40 };
+				inline static REX::INI::I32 iLockDC1{ "AutoPickRNG"sv, "iLockDC1"sv, 60 };
+				inline static REX::INI::I32 iLockDC2{ "AutoPickRNG"sv, "iLockDC2"sv, 80 };
+				inline static REX::INI::I32 iLockDC3{ "AutoPickRNG"sv, "iLockDC3"sv, 100 };
+				inline static REX::INI::I32 iRollMin{ "AutoPickRNG"sv, "iRollMin"sv, 1 };
+				inline static REX::INI::I32 iRollMax{ "AutoPickRNG"sv, "iRollMax"sv, 100 };
+				inline static REX::INI::I32 iModPerStat{ "AutoPickRNG"sv, "iModPerStat"sv, 3 };
+				inline static REX::INI::I32 iModPerLuck{ "AutoPickRNG"sv, "iModPerLuck"sv, 1 };
+				inline static REX::INI::I32 iModPerPerk{ "AutoPickRNG"sv, "iModPerPerk"sv, 20 };
+				inline static REX::INI::I32 iModBonus{ "AutoPickRNG"sv, "iModBonus"sv, 0 };
+				inline static REX::INI::Str sStatName{ "AutoPickRNG"sv, "sStatName"sv, "Perception"s };
 			};
 
 			class Runtime
@@ -84,18 +84,18 @@ namespace MCM
 				inline static RE::BGSListForm*    Perks_WaxKey{ nullptr };
 			};
 
-			inline static REX::INI::Bool bEnableAutoPick{ "AutoPick", "bEnableAutoPick", true };
-			inline static REX::INI::Bool bActivateCONT{ "AutoPick", "bActivateCONT", false };
-			inline static REX::INI::Bool bActivateDOOR{ "AutoPick", "bActivateDOOR", true };
-			inline static REX::INI::Bool bExperienceFromKeys{ "AutoPick", "bExperienceFromKeys", true };
-			inline static REX::INI::Bool bForceUnbreakable{ "AutoPick", "bForceUnbreakable", false };
-			inline static REX::INI::Bool bForceWaxKey{ "AutoPick", "bForceWaxKey", false };
-			inline static REX::INI::Bool bNoCrime{ "AutoPick", "bNoCrime", false };
-			inline static REX::INI::Bool bNoKeyUse{ "AutoPick", "bNoKeyUse", false };
-			inline static REX::INI::Bool bNoPickGates{ "AutoPick", "bNoPickGates", true };
-			inline static REX::INI::Bool bShowRollResults{ "AutoPick", "bShowRollResults", false };
-			inline static REX::INI::I32  iDetectionEventSuccess{ "AutoPick", "iDetectionEventSuccess", 0 };
-			inline static REX::INI::I32  iDetectionEventFailure{ "AutoPick", "iDetectionEventFailure", 0 };
+			inline static REX::INI::Bool bEnableAutoPick{ "AutoPick"sv, "bEnableAutoPick"sv, true };
+			inline static REX::INI::Bool bActivateCONT{ "AutoPick"sv, "bActivateCONT"sv, false };
+			inline static REX::INI::Bool bActivateDOOR{ "AutoPick"sv, "bActivateDOOR"sv, true };
+			inline static REX::INI::Bool bExperienceFromKeys{ "AutoPick"sv, "bExperienceFromKeys"sv, true };
+			inline static REX::INI::Bool bForceUnbreakable{ "AutoPick"sv, "bForceUnbreakable"sv, false };
+			inline static REX::INI::Bool bForceWaxKey{ "AutoPick"sv, "bForceWaxKey"sv, false };
+			inline static REX::INI::Bool bNoCrime{ "AutoPick"sv, "bNoCrime"sv, false };
+			inline static REX::INI::Bool bNoKeyUse{ "AutoPick"sv, "bNoKeyUse"sv, false };
+			inline static REX::INI::Bool bNoPickGates{ "AutoPick"sv, "bNoPickGates"sv, true };
+			inline static REX::INI::Bool bShowRollResults{ "AutoPick"sv, "bShowRollResults"sv, false };
+			inline static REX::INI::I32  iDetectionEventSuccess{ "AutoPick"sv, "iDetectionEventSuccess"sv, 0 };
+			inline static REX::INI::I32  iDetectionEventFailure{ "AutoPick"sv, "iDetectionEventFailure"sv, 0 };
 		};
 
 		static void Update()
@@ -150,12 +150,12 @@ namespace MCM
 
 		class EventHandler :
 			public RE::BSTEventSink<RE::MenuOpenCloseEvent>,
-			public REX::Singleton<EventHandler>
+			public REX::TSingleton<EventHandler>
 		{
 		public:
 			virtual RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent& a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override
 			{
-				if (a_event.menuName == "PauseMenu" && !a_event.opening)
+				if (!a_event.opening && a_event.menuName == "PauseMenu"sv)
 				{
 					MCM::Settings::Update();
 				}

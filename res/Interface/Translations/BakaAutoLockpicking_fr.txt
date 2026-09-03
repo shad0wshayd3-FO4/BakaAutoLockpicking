@@ -1,0 +1,76 @@
+$BakaAL_Header_LockDC	Difficulty Class
+$BakaAL_Header_PlayerDice	Player Dice
+$BakaAL_Header_RollMods	Modifiers
+$BakaAL_Header_Settings	Settings
+$BakaAL_Header_Status	Status
+$BakaAL_Help_ActivateCONT	Automatically activate unlocked containers.
+$BakaAL_Help_ActivateDOOR	Automatically activate unlocked doors.
+$BakaAL_Help_ActivateTERM	Automatically activate hacked terminals.
+$BakaAL_Help_DetectionEventFailure	Strength of a detection event that can alert nearby enemies after a failure. Setting this to 0 will disable these events.
+$BakaAL_Help_DetectionEventSuccess	Strength of a detection event that can alert nearby enemies after a success. Setting this to 0 will disable these events.
+$BakaAL_Help_EnableAuto	Enable/Disable auto-lockpicking.
+$BakaAL_Help_EnableAuto_Hack	Enable/Disable auto-hacking.
+$BakaAL_Help_ExperienceFromKeys	Using a key rewards the same experience that using a skill would have.
+$BakaAL_Help_ForceUnbreakable	Disable bobby pins breaking. Unlocking Locksmith 4 will also stop bobby pins from breaking.
+$BakaAL_Help_ForceUnbreakable_Hack	Disable terminals timeout after 4 failed attempts. Unlocking Hacker 4 will also stop timeouts.
+$BakaAL_Help_ForceWaxKeys	Automatically gives you a copy of a picked lock's key, if it has one.
+$BakaAL_Help_ForceWaxKey_Hack	Automatically gives you a copy of a hacked terminal's password, if it has one.
+$BakaAL_Help_LockDC0	The Difficulty Class of a Novice Lock.
+$BakaAL_Help_LockDC0_Hack	The Difficulty Class of a Novice Terminal.
+$BakaAL_Help_LockDC1	The Difficulty Class of a Advanced Lock.
+$BakaAL_Help_LockDC1_Hack	The Difficulty Class of a Advanced Terminal.
+$BakaAL_Help_LockDC2	The Difficulty Class of a Expert Lock.
+$BakaAL_Help_LockDC2_Hack	The Difficulty Class of a Expert Terminal.
+$BakaAL_Help_LockDC3	The Difficulty Class of a Master Lock.
+$BakaAL_Help_LockDC3_Hack	The Difficulty Class of a Master Terminal.
+$BakaAL_Help_ModBonus	Bonus modifier to all rolls. Negative numbers make all attempts harder, positive numbers make them easier.
+$BakaAL_Help_ModPerLuck	Bonus modifier to rolls from Luck. Default value gives +1 per point of Luck.
+$BakaAL_Help_ModPerPerk	Bonus modifier to rolls from perks (Locksmith 1/2/3). Cumulative for each of the perks unlocked.
+$BakaAL_Help_ModPerPerk_Hack	Bonus modifier to rolls from perks (Hacker 1/2/3). Cumulative for each of the perks unlocked.
+$BakaAL_Help_ModPerStat	Bonus modifier to rolls from Perception. Default value gives +3 per point of Perception.
+$BakaAL_Help_ModPerStat_Hack	Bonus modifier to rolls from Intelligence. Default value gives +3 per point of Intelligence.
+$BakaAL_Help_NoCrime	Disable crime events for unlawful lockpicking attempts. (Mostly unused in Fallout 4.)
+$BakaAL_Help_NoCrime_Hack	Disable crime events for unlawful hacking attempts. (Mostly unused in Fallout 4.)
+$BakaAL_Help_NoKeyUse	Attempt to pick locks that you already have a key for.
+$BakaAL_Help_NoKeyUse_Hack	Attempt to hack terminals that you already have a password for.
+$BakaAL_Help_NoGates	Disable the Locksmith perk requirement for high level locks.
+$BakaAL_Help_NoGates_Hack	Disable the Hacker perk requirement for high level terminals.
+$BakaAL_Help_PlayerDiceMax	The highest possible number you can roll.
+$BakaAL_Help_PlayerDiceMin	The lowest possible number you can roll.
+$BakaAL_Help_ShowRollResults	Display the results of each roll as a notification.
+$BakaAL_Help_StatName	The base stat to use for lockpicking for stat roll calculations.
+$BakaAL_Help_StatName_Hack	The base stat to use for hacking for stat roll calculations.
+$BakaAL_Page_General	Lockpicking
+$BakaAL_Page_General_Hack	Hacking
+$BakaAL_Page_Rolls	Lockpicking Rolls
+$BakaAL_Page_Rolls_Hack	Hacking Rolls
+$BakaAL_Page_Title	Baka Auto-Lockpicking
+$BakaAL_Text_ActivateCONT	Auto Activate Containers
+$BakaAL_Text_ActivateDOOR	Auto Activate Doors
+$BakaAL_Text_ActivateTERM	Auto Activate Terminals
+$BakaAL_Text_DetectionEventFailure	Detection Event Noise Level On Failure
+$BakaAL_Text_DetectionEventSuccess	Detection Event Noise Level On Success
+$BakaAL_Text_EnableAuto	Auto-Lockpicking
+$BakaAL_Text_EnableAuto_Hack	Auto-Hacking
+$BakaAL_Text_ExperienceFromKeys	Experience from Keys
+$BakaAL_Text_ForceUnbreakable	Unbreakable Bobby Pins
+$BakaAL_Text_ForceUnbreakable_Hack	No Terminal Timeout
+$BakaAL_Text_ForceWaxKeys	Give Keys
+$BakaAL_Text_ForceWaxKey_Hack	Give Passwords
+$BakaAL_Text_LockDC0	Novice
+$BakaAL_Text_LockDC1	Advanced
+$BakaAL_Text_LockDC2	Expert
+$BakaAL_Text_LockDC3	Master
+$BakaAL_Text_ModBonus	Bonus Modifier
+$BakaAL_Text_ModPerLuck	Luck Modifier
+$BakaAL_Text_ModPerPerk	Perk Modifier
+$BakaAL_Text_ModPerStat	Stat Modifier
+$BakaAL_Text_NoCrime	No Crime Events
+$BakaAL_Text_NoKeyUse	No Key Use
+$BakaAL_Text_NoKeyUse_Hack	No Password Use
+$BakaAL_Text_NoGates	No Lockpick Gates
+$BakaAL_Text_NoGates_Hack	No Hacking Gates
+$BakaAL_Text_PlayerDiceMax	Highest Possible Roll
+$BakaAL_Text_PlayerDiceMin	Lowest Possible Roll
+$BakaAL_Text_ShowRollResults	Show Roll Results
+$BakaAL_Text_StatName	Base Stat
